@@ -279,7 +279,8 @@ local function checkForContact(lander, dt)
 
 	-- check if lander is at or below the terrain
 	-- the offset is the size of the lander image
-	if lander.y > roundedGroundY - ship.image:getHeight() then		-- 8 = the image offset for visual effect
+	-- if lander.y > roundedGroundY - ship.image:getHeight() then		-- 8 = the image offset for visual effect
+	if lander.y > roundedGroundY - 20 then		-- 8 = the image offset for visual effect
 		-- a heavy landing will cause damage
 		checkForDamage(lander)
 
@@ -290,7 +291,7 @@ local function checkForContact(lander, dt)
 				-- need to destroy this single-use module
 				local moduleIndexToDestroy = 0
 				for moduleIndex, moduleItem in pairs(lander.modules) do
-					if moduleItem.id == 5 and moduleItem.deployed then	-- 5 = parachute
+					if moduleItem.id == Enum.moduleParachute and moduleItem.deployed then
 						moduleIndexToDestroy = moduleIndex
 						moduleItem.deployed = false
 						break
