@@ -16,7 +16,7 @@ local Lander = {}
 local keyDown = love.keyboard.isDown
 
 -- TODO: Create the spriteData with width and height automatically (except for animations)
-local ship = Assets.getImageSet("newship")
+-- local ship = Assets.getImageSet("newship")
 local shipImage = {}
 shipImage[1] = Assets.getImageSet("newship1")
 shipImage[2] = Assets.getImageSet("newship2")
@@ -592,7 +592,8 @@ function Lander.draw()
 	for landerId, lander in pairs(LANDERS) do
 		-- guard against connecting mplayer clients not having complete data
 		if landerId == 1 or lander.x ~= nil then
-			local sx, sy = 1.5, 1.5
+			--local sx, sy = 1.5, 1.5
+			local sx, sy = 0.75, 0.75
 			local x = lander.x - WORLD_OFFSET
 			local y = lander.y
 			local ox = shipImage[1].image:getWidth() / 2
@@ -615,36 +616,41 @@ function Lander.draw()
 			-- draw the legs based on distance above the ground (altitude)
 			local landerAltitude = altitude(lander)
 			local drawImage
-			if landerAltitude < 15 then
+			if landerAltitude < 30 then
 				drawImage = shipImage[5]
-			elseif landerAltitude < 25 then
+			elseif landerAltitude < 50 then
 				drawImage = shipImage[4]
-			elseif landerAltitude < 35 then
+			elseif landerAltitude < 70 then
 				drawImage = shipImage[3]
-			elseif landerAltitude < 45 then
+			elseif landerAltitude < 90 then
 				drawImage = shipImage[2]
 			else
 				drawImage = shipImage[1]
 			end
 
 			-- TODO: work out why ship.width doesn't work in mplayer mode
-			--love.graphics.draw(ship.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
 			love.graphics.draw(drawImage.image, x,y, math.rad(lander.angle), sx, sy, ox, oy)
 
 			-- draw flames
-			local ox = flame.width / 2
-			local oy = flame.height / 2
+			local ox = 17	-- the x offset actually makes the flame higher/low because the image is rotated
+			local oy = 15
+			local sx, sy = 1.5, 1.5
 			if lander.engineOn then
 				local angle = math.rad(lander.angle)
 				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 				lander.engineOn = false
 			end
+
 			if lander.leftEngineOn then
+				local ox = 15	-- the x offset actually makes the flame higher/low because the image is rotated
+				local oy = 15
 				local angle = math.rad(lander.angle + 90)
 				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 				lander.leftEngineOn = false
 			end
 			if lander.rightEngineOn then
+				local ox = 15	-- the x offset actually makes the flame higher/low because the image is rotated
+				local oy = 15
 				local angle = math.rad(lander.angle - 90)
 				love.graphics.draw(flame.image, x, y, angle, sx, sy, ox, oy)
 				lander.rightEngineOn = false
@@ -652,7 +658,7 @@ function Lander.draw()
 
 			-- draw label
 			love.graphics.setNewFont(10)
-			love.graphics.print(lander.name, x + 14, y - 10)
+			love.graphics.print(lander.name, x + 17, y - 15)
 			love.graphics.setColor(1,1,1,1)
 		end
 	end
