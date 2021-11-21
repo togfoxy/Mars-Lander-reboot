@@ -6,6 +6,7 @@
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 local Lander = {}
+local bubbleText = {}	-- Text that appears like a bubble
 
 
 
@@ -107,7 +108,7 @@ local function doThrust(lander, dt)
 		-- less mass = higher ratio = more thrust = less fuel needed to move
 		local massRatio = DEFAULT_MASS / Lander.getMass(lander)
 		-- for debugging only
-		if DEBUG then
+		if GAME_CONFIG.showDEBUG then
 			MASS_RATIO = massRatio
 		end
 
@@ -255,6 +256,16 @@ local function checkForDamage(lander)
 	end
 end
 
+local function createBubbleText(lander, text)
+-- creates a bubble object and adds it to the bubble table for Drawing
+	local myBubble = {}
+	myBubble.text = text
+	myBubble.timeleft = 4	-- bubble will last 4 seconds
+	myBubble.x = lander.x - WORLD_OFFSET
+	myBubble.y = lander.y - 50
+	table.insert(bubbleText, myBubble)
+end
+
 
 
 local function checkForContact(lander, dt)
@@ -304,6 +315,8 @@ local function checkForContact(lander, dt)
 			end
 		end
 
+		local startMoney = lander.money	-- capture this here and do calculation further down
+
 		-- NOTE: if you need to check things on first contact with terrain (like receiving damage) then place
 		-- that code above lander.onGround = true
 
@@ -323,6 +336,11 @@ local function checkForContact(lander, dt)
 			-- this is the first landing on this base so pay money based on vertical and horizontal speed
 			if not bestBase.paid then
 				payLanderForControl(lander, bestBase)
+
+				local stopMoney = lander.money
+				local moneyEarned = stopMoney - startMoney
+				myBubble = createBubbleText(lander, moneyEarned)
+
 				bestBase.paid = true
 			-- check for game-over conditions
 			elseif not bestBase.active and lander.fuel <= 1 then
@@ -400,7 +418,31 @@ local function altitude(lander)
 	return groundYValue - landerYValue
 end
 
+local function drawBubbleText()
+-- draws bubbles
+	for k,v in pairs(bubbleText) do
 
+
+		Assets.setFont("font14")
+		-- setting alpha is a hack. timeleft starts > 1 but then decreases to zero
+		love.graphics.setColor(251/255, 1, 119/255, v.timeleft)
+		love.graphics.print("$" .. v.text, Cf.round(v.x), Cf.round(v.y))
+		love.graphics.setColor(1, 1, 1, 1)
+	end
+end
+
+local function updateBubbleText(dt)
+-- apply dt to bubbles so they expire
+
+	for k,v in pairs(bubbleText) do
+		v.timeleft = v.timeleft - dt
+		if v.timeleft <= 0 then
+			table.remove(bubbleText,k)
+		else
+			v.y = v.y - (dt * 15)	-- bubble floats up
+		end
+	end
+end
 
 -- ~~~~~~~~~~~~~~~~~
 -- Public functions
@@ -583,6 +625,7 @@ function Lander.update(lander, dt)
     playSoundEffects(lander)
     checkForContact(lander, dt)
 	updateScore(lander)
+	updateBubbleText(dt)
 end
 
 
@@ -660,6 +703,9 @@ function Lander.draw()
 			love.graphics.setNewFont(10)
 			love.graphics.print(lander.name, x + 17, y - 15)
 			love.graphics.setColor(1,1,1,1)
+
+			-- draw bubble text above lander
+			drawBubbleText(dt)
 		end
 	end
 end

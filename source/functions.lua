@@ -6,9 +6,11 @@ local function setDefaultGameConfigs()
 -- sets all game configs to default settings
 
 	GAME_CONFIG = {}
+	GAME_CONFIG.showDEBUG = false
 	GAME_CONFIG.allowParachutes = true
 	GAME_CONFIG.useAdvancedPhysics = false
 	GAME_CONFIG.easyMode = false
+	GAME_CONFIG.music = true
 
 end
 

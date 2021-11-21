@@ -64,7 +64,7 @@ function Menus.DrawMainMenu()
 
 		if Slab.Button("Save game",{W=155}) then
 			if not ENET_IS_CONNECTED then
-				Fun.SaveGame() 
+				Fun.SaveGame()
 			else
 				LovelyToasts.show("Can't save a multiplayer game",3, "middle")
 			end
@@ -104,7 +104,7 @@ function Menus.DrawMainMenu()
 			}
 			if Slab.Input('hostIP', joinIPOptions) then
 				GAME_SETTINGS.hostIP = Slab.GetInputText()
-			end		
+			end
 
 			Slab.Text("Join on port:" )
 			local joinPortOptions = {
@@ -244,7 +244,7 @@ function Menus.DrawCredits()
 			if Slab.Button("Awesome!") then
 				-- return to the previous game state
 				Fun.RemoveScreen()
-			end	
+			end
 
 		Slab.EndLayout()
 
@@ -273,7 +273,7 @@ function Menus.DrawSettingsMenu()
 
 	Slab.BeginWindow('settingsWindow', settingsWindowOptions)
 		Slab.BeginLayout('layout-settings',{AlignX = "left", Columns = 2})
-		
+
 		Slab.SetLayoutColumn(1)
 
 		Slab.Textf("Name:")
@@ -301,30 +301,34 @@ function Menus.DrawSettingsMenu()
 		Slab.NewLine()
 
 		-- all the configurable options go here
+		-- set default values in setDefaultGameConfigs()
 		Slab.SetLayoutColumn(2)
-		
+
 		Slab.Textf("Options:")
 		if Slab.CheckBox(GAME_CONFIG.showDEBUG, "Show debug info") then
 			GAME_CONFIG.showDEBUG = not GAME_CONFIG.showDEBUG
-		end		
+		end
 
 		if Slab.CheckBox(GAME_CONFIG.easyMode, "Easy mode") then
 			GAME_CONFIG.easyMode = not GAME_CONFIG.easyMode
 		end
-		
+
 		if Slab.CheckBox(GAME_CONFIG.allowParachutes, "Allow parachutes") then
 			GAME_CONFIG.allowParachutes = not GAME_CONFIG.allowParachutes
 		end
-		
+
 		if Slab.CheckBox(GAME_CONFIG.useAdvancedPhysics, "Use advanced physics") then
 			GAME_CONFIG.useAdvancedPhysics = not GAME_CONFIG.useAdvancedPhysics
 		end
-		
+
+		if Slab.CheckBox(GAME_CONFIG.music, "Music (needs restart)") then
+			GAME_CONFIG.music = not GAME_CONFIG.music
+		end
 		Slab.EndLayout() -- layout-settings
-		
+
 		-- this displays the OK button at the bottom
 		Slab.BeginLayout('layout-settings2',{AlignX = "center"})
-			
+
 			Slab.NewLine()
 			Slab.NewLine()
 			Slab.NewLine()
@@ -333,15 +337,15 @@ function Menus.DrawSettingsMenu()
 			Slab.NewLine()
 			Slab.NewLine()
 			Slab.NewLine()
-			
-			Slab.Separator()	
+
+			Slab.Separator()
 			Slab.NewLine()
 			if Slab.Button("OK") then
 				-- return to the previous game state
 				Fun.RemoveScreen()
-			end		
+			end
 		Slab.EndLayout() -- layout-settings
-		
+
 	Slab.EndWindow()
 end
 
