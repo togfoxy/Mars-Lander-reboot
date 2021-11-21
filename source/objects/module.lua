@@ -11,34 +11,44 @@ function NewModules.createModules()
 
     SHOP_MODULES = {}
 
-    SHOP_MODULES[Enum.moduleEfficientThrusters] = {}
-    SHOP_MODULES[Enum.moduleEfficientThrusters].name = "Efficient thrusters"
-    SHOP_MODULES[Enum.moduleEfficientThrusters].cost = 225
-    SHOP_MODULES[Enum.moduleEfficientThrusters].mass = 20
+    local myModule = {}
+    myModule.id = Enum.moduleEfficientThrusters
+    myModule.name = "Efficient thrusters"
+    myModule.cost = 225
+    myModule.mass = 20
+    table.insert(SHOP_MODULES, myModule)
 
-    SHOP_MODULES[Enum.moduleLargeTank] = {}
-    SHOP_MODULES[Enum.moduleLargeTank].name = "Large fuel tank"
-    SHOP_MODULES[Enum.moduleLargeTank].cost = 200
-    SHOP_MODULES[Enum.moduleLargeTank].mass = 10
-    SHOP_MODULES[Enum.moduleLargeTank].fuelCapacity = 32
-    SHOP_MODULES[Enum.moduleLargeTank].fuelCapacity = 32
+    myModule = {}
+    myModule.id = Enum.moduleLargeTank
+    myModule.name = "Large fuel tank"
+    myModule.cost = 200
+    myModule.mass = 10
+    myModule.fuelCapacity = 32
+    myModule.fuelCapacity = 32
+    table.insert(SHOP_MODULES, myModule)
 
-    SHOP_MODULES[Enum.moduleRangefinder] = {}
-    SHOP_MODULES[Enum.moduleRangefinder].name = "Rangefinder"
-    SHOP_MODULES[Enum.moduleRangefinder].cost = 175
-    SHOP_MODULES[Enum.moduleRangefinder].mass = 5
+    myModule = {}
+    myModule.id = Enum.moduleRangefinder
+    myModule.name = "Rangefinder"
+    myModule.cost = 175
+    myModule.mass = 5
+    table.insert(SHOP_MODULES, myModule)
 
-    SHOP_MODULES[Enum.moduleSideThrusters] = {}
-    SHOP_MODULES[Enum.moduleSideThrusters].name = "Side thrusters"
-    SHOP_MODULES[Enum.moduleSideThrusters].cost = 185
-    SHOP_MODULES[Enum.moduleSideThrusters].mass = 20
+    myModule = {}
+    myModule.id = Enum.moduleSideThrusters
+    myModule.name = "Side thrusters"
+    myModule.cost = 185
+    myModule.mass = 20
+    table.insert(SHOP_MODULES, myModule)
 
-    SHOP_MODULES[Enum.moduleParachute] = {}
-    SHOP_MODULES[Enum.moduleParachute].name = "Parachute (single use)"
-    SHOP_MODULES[Enum.moduleParachute].cost = 100
-    SHOP_MODULES[Enum.moduleParachute].mass = 10
-    SHOP_MODULES[Enum.moduleParachute].deployed = false
-    SHOP_MODULES[Enum.moduleParachute].allowed = true
+    myModule = {}
+    myModule.id = Enum.moduleParachute
+    myModule.name = "Parachute (single use)"
+    myModule.cost = 100
+    myModule.mass = 10
+    myModule.deployed = false
+    myModule.allowed = true
+    table.insert(SHOP_MODULES, myModule)
 end
 
 return NewModules

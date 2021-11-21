@@ -75,7 +75,6 @@ Assets.newFont(20)
 -- TODO: Turn global modules / objects to local ones
 -- Scripts
 Enum		= require 'scripts.enum'		-- ensure Enum is declared first
-Modules		= require 'scripts.modules'		-- Lander modules
 NewModules  = require 'objects.module'
 
 -- Objects
@@ -218,6 +217,7 @@ function love.load()
 	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
 	Terrain.init()
 	NewModules.createModules()
+
 	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable

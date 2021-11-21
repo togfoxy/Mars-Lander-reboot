@@ -57,7 +57,7 @@ local function landerHasFuelToThrust(lander, dt)
 -- returns false if not enough fuel to thrust
 -- Note: fuel can be > 0 but still not enough to thrust
 
-	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Modules.thrusters)
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleEfficientThrusters))
 	if (lander.fuel - dt) >= 0 or (hasThrusterUpgrade and (lander.fuel - (dt * 0.80)) >= 0) then
 		return true
 	else
@@ -97,7 +97,7 @@ end
 
 
 local function doThrust(lander, dt)
-	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Modules.thrusters)
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleEfficientThrusters))
 	if landerHasFuelToThrust(lander, dt) then
 		local angleRadian = math.rad(lander.angle)
 		local forceX = math.cos(angleRadian) * dt
@@ -138,7 +138,7 @@ end
 
 local function thrustLeft(lander, dt)
 -- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
-	if Lander.hasUpgrade(lander, Modules.sideThrusters) and landerHasFuelToThrust(lander, dt) then
+	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleSideThrusters)) and landerHasFuelToThrust(lander, dt) then
 		local forceX = 0.5 * dt
 		lander.vx = lander.vx - forceX
 		-- opposite engine is on
@@ -147,7 +147,7 @@ local function thrustLeft(lander, dt)
 	end
 
 	-- if trying to side thrust and has parachute and descending and on the screen then ...
-	if Lander.hasUpgrade(lander, Modules.parachute) and not landerHasFuelToThrust(lander, dt) then
+	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleParachute)) and not landerHasFuelToThrust(lander, dt) then
 		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
 			-- parachutes allow left/right drifting even if no fuel and thrusters available
 			deployParachute(lander)
@@ -160,7 +160,7 @@ end
 
 
 local function thrustRight(lander, dt)
-	if Lander.hasUpgrade(lander, Modules.sideThrusters) and landerHasFuelToThrust(lander, dt) then
+	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleSideThrusters)) and landerHasFuelToThrust(lander, dt) then
 		local forceX = 0.5 * dt
 		lander.vx	= lander.vx + forceX
 		lander.fuel = lander.fuel - forceX
@@ -169,7 +169,7 @@ local function thrustRight(lander, dt)
 	end
 
 	-- if trying to side thrust and has parachute and descending and on the screen then ...
-	if Lander.hasUpgrade(lander, Modules.parachute) and not landerHasFuelToThrust(lander, dt) then
+	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleParachute)) and not landerHasFuelToThrust(lander, dt) then
 		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
 			deployParachute(lander)
 			local forceX = 0.5 * dt
@@ -280,7 +280,7 @@ local function checkForContact(lander, dt)
 	-- check if lander is at or below the terrain
 	-- the offset is the size of the lander image
 	-- if lander.y > roundedGroundY - ship.image:getHeight() then		-- 8 = the image offset for visual effect
-	if lander.y > roundedGroundY - 20 then		-- 8 = the image offset for visual effect
+	if lander.y > roundedGroundY - 20 then		-- 20 = the image offset for visual effect
 		-- a heavy landing will cause damage
 		checkForDamage(lander)
 
@@ -384,6 +384,9 @@ local function buyModule(module, lander)
 			-- add and calculate new mass
 			lander.mass[#lander.mass+1] = module.mass
 			DEFAULT_MASS = recalcDefaultMass(lander)
+
+print(Inspect(lander.modules))
+
 		else
 			-- play 'failed' sound
 			failSound:play()
@@ -410,7 +413,7 @@ function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
 	lander.x = Cf.round(ORIGIN_X,0)
-	lander.y = GROUND[lander.x] - 8
+	lander.y = GROUND[lander.x] - 20	-- 20 is the image offset so it appears to be on the ground
 	lander.connectionID = nil	-- used by enet
 	-- 270 = up
 	lander.angle = 270
@@ -659,12 +662,13 @@ function Lander.keypressed(key, scancode, isrepeat)
 	-- Let the player buy upgrades when landed on a fuel base
 	local lander = LANDERS[1]
 
-	if Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
-		-- Iterate all available modules
-		for _, module in pairs(Modules) do
-			-- Press key assigned to the module by its id
-			if key == tostring(module.id) then
-				buyModule(module, lander)
+	-- TODO: simplify this code
+	if key ~= nil and tonumber(key) ~= nil then
+		if tonumber(key) > 0 then
+			if Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
+				if tonumber(key) <= #SHOP_MODULES then
+					buyModule(SHOP_MODULES[tonumber(key)], lander)
+				end
 			end
 		end
 	end
