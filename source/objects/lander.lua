@@ -481,6 +481,8 @@ function Lander.reset(lander)
 	lander.fuel = lander.fuelCapacity
 	-- this is the mass of an empty tank
 	table.insert(lander.mass, 20)
+
+	-- TODO: why is this here?
 	-- this is the mass of the rangefinder (not yet purchased)
 	table.insert(lander.mass, 0)
 
