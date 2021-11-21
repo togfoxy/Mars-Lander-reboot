@@ -12,11 +12,14 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - the 'R'eset key is disabled in mplayer mode. Use the new enter/return key to reset a single lander
 - disabled load/save when in multiplayer mode
 - can now buy a parachute module. Deploys automatically. Use the side thruster keys (q/e) to steer. Single use.
-- Host/client disconnections are now actively managed
+- host/client disconnections are now actively managed
 - ability for external clients to connect over internet (not just LAN)
 - expanded the settings slab window to accommodate game options
+- easy mode prevents negative cash balance and starts with a lot of money
+- lander now has animated legs
 
 ### Changed
+- lander image
 
 ### Fixed
 - fix background drawn wrong on full screen
