@@ -18,7 +18,7 @@ local function configureModules()
 -- modules need to be activated once GAME_SETTINGS is loaded
 -- cycle through all modules and set ACTIVE on those that are configurable
 
-	for _,module in pairs(Modules) do
+	for _,module in pairs(SHOP_MODULES) do
 		if module.id == Enum.moduleParachute then
 			module.allowed = GAME_CONFIG.allowParachutes
 		end
@@ -57,14 +57,14 @@ function functions.RemoveScreen()
 	if #CURRENT_SCREEN == 1 then
 		functions.quitGame()
 	end
-	
+
 	-- save settings if leaving the settings screen
 	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
 	if strCurrentScreen == "Settings" then
 		Fun.SaveGameSettings()
 		Fun.SaveGameConfig()
 	end
-	
+
 	table.remove(CURRENT_SCREEN)
 end
 
@@ -115,10 +115,10 @@ function functions.LoadGameConfig()
 	if success == false then
 		setDefaultGameConfigs()
 	end
-	
+
 	-- turn on and off modules
 	configureModules()
-	
+
 end
 
 
@@ -309,7 +309,7 @@ function functions.ResetGame()
 
 	-- ensure Terrain.init appears before Lander.create
 	Terrain.init()
-	
+
 	-- TODO: mplayer needs to reset without wiping LANDERS
 	--       or to wipe LANDERS and recreate each client
 
@@ -317,7 +317,19 @@ function functions.ResetGame()
 		LANDERS = {}
 		table.insert(LANDERS, Lander.create())
 	end
-	
+
+end
+
+function functions.getModule(moduleType)
+-- Input: an enum representing the required module type.  eg: moduleRangefinder
+-- OUtput: the module with that module baseType
+
+	for k,v in pairs(SHOP_MODULES) do
+		if v.id == moduleType then
+			return v
+		end
+	end
+	return nil
 end
 
 return functions

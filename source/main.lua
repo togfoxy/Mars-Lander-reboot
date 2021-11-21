@@ -75,7 +75,7 @@ Assets.newFont(20)
 -- TODO: Turn global modules / objects to local ones
 -- Scripts
 Enum		= require 'scripts.enum'		-- ensure Enum is declared first
-Modules		= require 'scripts.modules'		-- Lander modules
+NewModules  = require 'objects.module'
 
 -- Objects
 Smoke 		= require 'objects.smoke'		-- Smoke particles for objects
@@ -101,6 +101,7 @@ CURRENT_SCREEN = {}	-- Current screen / state the user is in
 LANDERS = {}
 GROUND = {}			-- stores the y value for the ground
 OBJECTS = {}		-- stores objects that need to be drawn
+SHOP_MODULES = {}
 MASS_RATIO = 0		-- for debugging only. Records current mass/default mass ratio
 GAME_SETTINGS = {}	-- track game settings
 GAME_CONFIG = {}	-- tracks the user defined settings for modules turned on and off
@@ -143,10 +144,10 @@ local background = Assets.getImageSet("background1")
 
 local function drawWallpaper()
 	-- stretch or shrink the image to fit the window
-	
+
 	-- this is the current size of the window
 	local screenwidth, screenheight = love.graphics.getDimensions( )
-	
+
 	local sx = screenwidth / background.width
 	local sy = screenheight / background.height
 	love.graphics.setColor(1, 1, 1, 0.25)
@@ -179,10 +180,10 @@ end
 
 function love.load()
     if love.filesystem.isFused() then
-	
+
 		-- nullify the assert function for performance reasons
 		function assert() end
-	
+
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
         love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
@@ -212,9 +213,11 @@ function love.load()
 
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
-	
+
 	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
-	Terrain.init()	
+	Terrain.init()
+	NewModules.createModules()
+
 	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
@@ -303,20 +306,20 @@ function love.keypressed(key, scancode, isrepeat)
 		-- Restart the game. Different to reset a single lander
 		if key == "r" then
 			Fun.ResetGame()
-				
+
 		-- restart just the player lander (for mulitplayer)
 		elseif key == "kpenter" or key == "return" then
 			Lander.reset(LANDERS[1])
-			
+
 		-- Pause the game
 		elseif key == "p" then
 			Fun.AddScreen("Pause")
-			
+
 		-- Open options menu
 		elseif key == "o" then
 			Fun.AddScreen("Settings")
 		end
-		
+
 		-- update Lander keys
 		Lander.keypressed(key, scancode, isrepeat)
 	elseif strCurrentScreen == "Pause" then
@@ -325,6 +328,6 @@ function love.keypressed(key, scancode, isrepeat)
 		end
 	end
 
-	
+
 
 end

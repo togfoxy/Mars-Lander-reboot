@@ -82,9 +82,11 @@ end
 
 
 
+
+
 local function drawRangefinder(lander)
 -- determine distance to nearest base and draw indicator
-	local module = Modules.rangefinder
+	local module = Fun.getModule(Enum.moduleRangefinder)
 	if Lander.hasUpgrade(lander, module) then
 
 		local rawDistance, _ = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
@@ -94,10 +96,10 @@ local function drawRangefinder(lander)
 		end
 		if rawDistance > Enum.rangefinderMaximumDistance then
 			rawDistance = Enum.rangefinderMaximumDistance
-		end	
-		
+		end
+
 		local absDistance = math.abs(Cf.round(rawDistance, 0))
-		
+
 		-- don't draw if close to base
 		if absDistance > 100 then
 			local halfScreenW = SCREEN_WIDTH / 2
@@ -143,11 +145,10 @@ local function drawShopMenu()
 		-- Create List of available modules
 		local y = SCREEN_HEIGHT * 0.33
 
-		for k, module in pairs(Modules) do
+		for k,module in ipairs(SHOP_MODULES) do
 			if module.allowed == nil or module.allowed == true then
 				local string = "%s. Buy %s - $%s \n"
-				itemListString = string.format(string, module.id, module.name, module.cost)
-				-- Draw list of modules
+				itemListString = string.format(string, k, module.name, module.cost)
 				local color = {1, 1, 1, 1}
 				if Lander.hasUpgrade(LANDERS[1], module) then
 					color = {.8, .1, .1, .5}
@@ -181,13 +182,13 @@ local function drawScore()
 	local x = SCREEN_WIDTH - 15 - lineLength	-- the 15 is an asthetic margin from the right edge
 	local y = SCREEN_HEIGHT * 0.20
 	local alignment	= "right"
-	
+
 	Assets.setFont("font14")
 	for _,lander in pairs(LANDERS) do
 		-- guard against connecting mplayer clients not having complete data
 		if lander.score ~= nil then
 			local roundedScore = Cf.round(lander.score)
-			local formattedScore = Cf.strFormatThousand(roundedScore)		
+			local formattedScore = Cf.strFormatThousand(roundedScore)
 			local tempString = lander.name .. ": " .. formattedScore
 			love.graphics.printf(tempString,x,y, lineLength, alignment)
 			y = y + 20	-- prep the y value for the next score (will be ignored for single player)
@@ -196,7 +197,7 @@ local function drawScore()
 
 	-- print high score
 	local highscore = Cf.strFormatThousand(Cf.round(GAME_SETTINGS.HighScore))
-	love.graphics.print("High Score: " .. highscore, (SCREEN_WIDTH / 2) - 75, 90)	
+	love.graphics.print("High Score: " .. highscore, (SCREEN_WIDTH / 2) - 75, 90)
 end
 
 
