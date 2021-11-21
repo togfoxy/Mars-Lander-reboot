@@ -429,6 +429,7 @@ function Lander.create(name)
 
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
+	end
 
 
 	-- mass
