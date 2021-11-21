@@ -384,9 +384,6 @@ local function buyModule(module, lander)
 			-- add and calculate new mass
 			lander.mass[#lander.mass+1] = module.mass
 			DEFAULT_MASS = recalcDefaultMass(lander)
-
-print(Inspect(lander.modules))
-
 		else
 			-- play 'failed' sound
 			failSound:play()
@@ -429,6 +426,10 @@ function Lander.create(name)
 	lander.gameOver = false
 	lander.score = lander.x - ORIGIN_X
 	lander.name = name or CURRENT_PLAYER_NAME
+
+	if GAME_CONFIG.easyMode then
+		lander.money = 9999
+
 
 	-- mass
 	lander.mass = {}
