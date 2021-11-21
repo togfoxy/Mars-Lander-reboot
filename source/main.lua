@@ -189,15 +189,14 @@ function love.load()
         love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
         DEBUG = false
 
-		-- Play music
-		-- true for "isLooping"
-		Assets.playSound("menuTheme", true)
-		Assets.getSound("menuTheme"):setVolume(.2)
+
     else
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
 		love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
     end
+
+
 
 	local socket = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = socket.dns.toip(socket.dns.gethostname())
@@ -207,6 +206,13 @@ function love.load()
 	-- Load settings
 	Fun.LoadGameSettings()
 	Fun.LoadGameConfig()
+
+	-- Play music
+	-- true for "isLooping"
+	if GAME_CONFIG.music then
+		Assets.playSound("menuTheme", true)
+		Assets.getSound("menuTheme"):setVolume(.2)
+	end
 
 	-- Restore full screen setting
 	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
