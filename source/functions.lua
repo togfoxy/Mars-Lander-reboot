@@ -6,9 +6,11 @@ local function setDefaultGameConfigs()
 -- sets all game configs to default settings
 
 	GAME_CONFIG = {}
+	GAME_CONFIG.showDEBUG = false
 	GAME_CONFIG.allowParachutes = true
 	GAME_CONFIG.useAdvancedPhysics = false
 	GAME_CONFIG.easyMode = false
+	GAME_CONFIG.music = true
 
 end
 
@@ -94,7 +96,7 @@ function functions.SaveGameConfig()
 	local success, message
 	local savedir = love.filesystem.getSource()
 
-    savefile = savedir .. "/" .. "gameconfig.dat"
+    savefile = savedir .. "/savedata/" .. "gameconfig.dat"
     serialisedString = Bitser.dumps(GAME_CONFIG)
     success, message = Nativefs.write(savefile, serialisedString )
 end
@@ -107,7 +109,7 @@ function functions.LoadGameConfig()
 
     local savefile, contents
 
-    savefile = savedir .. "/" .. "gameconfig.dat"
+    savefile = savedir .. "/savedata/" .. "gameconfig.dat"
     contents, _ = Nativefs.read(savefile)
 	local success
     success, GAME_CONFIG = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
@@ -130,7 +132,7 @@ function functions.SaveGameSettings()
 	local success, message
 	local savedir = love.filesystem.getSource()
 
-    savefile = savedir .. "/" .. "settings.dat"
+    savefile = savedir .. "/savedata/" .. "settings.dat"
     serialisedString = Bitser.dumps(GAME_SETTINGS)
     success, message = Nativefs.write(savefile, serialisedString )
 end
@@ -144,7 +146,7 @@ function functions.LoadGameSettings()
 
     local savefile, contents
 
-    savefile = savedir .. "/" .. "settings.dat"
+    savefile = savedir .. "/savedata" .. "settings.dat"
     contents, _ = Nativefs.read(savefile)
 	local success
     success, GAME_SETTINGS = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
@@ -190,15 +192,15 @@ function functions.SaveGame()
     local success, message
     local savedir = love.filesystem.getSource()
 
-    savefile = savedir .. "/" .. "landers.dat"
+    savefile = savedir .. "/savedata/" .. "landers.dat"
     serialisedString = Bitser.dumps(LANDERS)
     success, message = Nativefs.write(savefile, serialisedString )
 
-    savefile = savedir .. "/" .. "ground.dat"
+    savefile = savedir .. "/savedata/" .. "ground.dat"
     serialisedString = Bitser.dumps(GROUND)
     success, message = Nativefs.write(savefile, serialisedString )
 
-    savefile = savedir .. "/" .. "objects.dat"
+    savefile = savedir .. "/savedata/" .. "objects.dat"
     serialisedString = Bitser.dumps(OBJECTS)
     success, message = Nativefs.write(savefile, serialisedString )
 
@@ -218,7 +220,7 @@ function functions.LoadGame()
 	local size
 	local error = false
 
-	savefile = savedir .. "/" .. "ground.dat"
+	savefile = savedir .. "/savedata/" .. "ground.dat"
 	if Nativefs.getInfo(savefile) then
 		contents, size = Nativefs.read(savefile)
 	    GROUND = bitser.loads(contents)
@@ -226,7 +228,7 @@ function functions.LoadGame()
 		error = true
 	end
 
-    savefile = savedir .. "/" .. "objects.dat"
+    savefile = savedir .. "/savedata/" .. "objects.dat"
 	if Nativefs.getInfo(savefile) then
 		contents, size = Nativefs.read(savefile)
 	    OBJECTS = bitser.loads(contents)
@@ -234,7 +236,7 @@ function functions.LoadGame()
 		error = true
 	end
 
-    savefile = savedir .. "/" .. "landers.dat"
+    savefile = savedir .. "/savedata/" .. "landers.dat"
 	if Nativefs.getInfo(savefile) then
 	    contents, size = Nativefs.read(savefile)
 	    LANDERS = bitser.loads(contents)

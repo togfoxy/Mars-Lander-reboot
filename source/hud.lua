@@ -18,7 +18,7 @@ HUD.fuel.text.width, HUD.fuel.text.height = HUD.fuel.text.image:getDimensions()
 HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.fuel.text.height / 2)
 
 
-local ship = Assets.getImageSet("ship")
+local ship = Assets.getImageSet("newship1")
 local flame = Assets.getImageSet("flame")
 
 
@@ -59,11 +59,11 @@ local function drawOffscreenIndicator(lander)
     local lineThickness = love.graphics.getLineWidth()
     love.graphics.setLineWidth(3)
     local indicatorY = 40
-    local magnifier = 1.5
+    local magnifier = 0.75
     local x, y = lander.x - WORLD_OFFSET, ship.height + indicatorY
     if lander.y < 0 then
         love.graphics.draw(ship.image, x, y, math.rad(lander.angle), magnifier, magnifier, ship.width/2, ship.height/2)
-        love.graphics.circle("line", x, y, ship.height + 5)
+        love.graphics.circle("line", x, y, ship.height * magnifier)
         love.graphics.polygon("fill", x, lander.y, x - 10, indicatorY - 5, x + 10, indicatorY - 5)
         if lander.engineOn then
             love.graphics.draw(flame.image, x, y, math.rad(lander.angle), magnifier, magnifier, flame.width/2, flame.height/2)
@@ -215,6 +215,9 @@ local function drawDebug()
 		love.graphics.print("Ground: " .. #GROUND, 10, 160)
 		love.graphics.print("Objects: " .. #OBJECTS, 10, 180)
 		love.graphics.print("WorldOffsetX: " .. WORLD_OFFSET, 10, 200)
+
+		local text = Cf.round(lander.x) .. "  " .. Cf.round(lander.y) .. "  " .. Cf.round(lander.vx,3) .. "  " .. Cf.round(lander.vy,3)
+		love.graphics.print(text, lander.x - WORLD_OFFSET + 20, lander.y + 20)
 	end
 end
 
