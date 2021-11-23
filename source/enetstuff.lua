@@ -39,25 +39,31 @@ function EnetHandler.createHost()
 
 	server = Sock.newServer("*", 22122)
 	ENET_IS_CONNECTED = true
-	
+
     -- Called when receiving a message of type "connect"
     server:on("connect", function(data, client)
         -- Send a message of type "welcome" back to the connected client
-		client:send("welcome", client:getConnectId())
-		
+		local senddata = {}
+		local connID = client:getConnectId()
+		senddata.connID = connID
+		senddata.gameSettings = GAME_CONFIG
+		client:send("welcome", senddata)
+
 		local newLander = Lander.create()
-		newLander.connectionID = client:getConnectId()
+		newLander.connectionID = connID
 		table.insert(LANDERS, newLander)
-		
+
+-- print("Num of landers is now " .. #LANDERS)
+
 		LovelyToasts.show("Client connected",3, "top")
 	end)
-	
+
 	server:on("clientdata", function(lander, clientInfo)
 
 		-- match the incoming lander object
 		for _,v in pairs(LANDERS) do
 			if v.connectionID == lander.connectionID then
-				v.x = lander.x 
+				v.x = lander.x
 				v.y = lander.y
 				v.connectionID = lander.connectionID	-- used by enet
 				v.angle = lander.angle
@@ -70,7 +76,7 @@ function EnetHandler.createHost()
 			end
 		end
 	end)
-	
+
 	server:on("clientdisconnect", function(clientConnectionID, clientInfo)
 		local isLanderFound = false
 		local myLanderIndex
@@ -94,25 +100,23 @@ function EnetHandler.createClient()
 	LovelyToasts.show("Trying to connect on " .. GAME_SETTINGS.hostIP,3, "middle")
 
 	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
-	
+
 	-- these are all the types of messages the client could receive from the host
-	
+
     client:on("connect", function(data)
         print("Client trying to connect to the server.")
 	end)
-	
-    client:on("welcome", function(msg)
-        print("My connection ID is " .. msg)
-		assert(msg == client:getConnectId())
-		
-		LANDERS[1].connectionID = msg
-		
+
+    client:on("welcome", function(data)
+		-- msg is the GAME_CONFIG table sent from the host to the client
+		GAME_CONFIG = Cf.deepcopy(data.gameSettings)
+		LANDERS[1].connectionID = data.connID
 		if not ENET_IS_CONNECTED then
 			Fun.AddScreen("World")
 			ENET_IS_CONNECTED = true
 		end
 	end)
-	
+
 	client:on("peerupdate", function(peerLander)
 		-- have received information about other peers
 		-- cycle through list of known peers
@@ -129,17 +133,20 @@ function EnetHandler.createClient()
 			end
 			if isLanderFound == false then
 				table.insert(LANDERS, peerLander)
+
+print(#LANDERS)
+
 			else
 				LANDERS[myindex] = peerLander
 			end
 		end
 	end)
-	
+
     -- Called when the client disconnects from the server
     client:on("disconnect", function(data)
         print("Client disconnected from the server.")
     end)
-	
+
 	client:on("hostshutdown", function()
 		client:disconnect()
 		ENET_IS_CONNECTED = false
@@ -150,7 +157,7 @@ function EnetHandler.createClient()
 			end
 		end
 	end)
-		
+
 	client:connect()
 end
 
@@ -160,21 +167,22 @@ function EnetHandler.update(dt)
 		timerHostSendTimer = timerHostSendTimer - dt
 		if timerHostSendTimer <= 0 then
 			timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
+			-- send each lander through in a loop
 			for _, lander in pairs(LANDERS) do
 				server:sendToAll("peerupdate",lander)
 			end
 		end
-		
+
 		server:update()
 	end
-	
+
 	if IS_A_CLIENT then
 		timerClientSendTimer = timerClientSendTimer - dt
 		if timerClientSendTimer <= 0 then
 			timerClientSendTimer = timerClientSendInterval
 			client:send("clientdata", LANDERS[1])
 		end
-	
+
 		client:update()
 	end
 

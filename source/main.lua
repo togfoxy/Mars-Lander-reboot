@@ -15,8 +15,8 @@ io.stdout:setvbuf("no")
 DEBUG = true
 
 -- Global screen dimensions
-SCREEN_WIDTH = 1024 -- 1920
-SCREEN_HEIGHT = 768 -- 1080
+SCREEN_WIDTH = 1280 -- 1024 -- 1920
+SCREEN_HEIGHT = 800 -- 768 -- 1080
 
 
 
