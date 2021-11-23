@@ -421,12 +421,10 @@ end
 local function drawBubbleText()
 -- draws bubbles
 	for k,v in pairs(bubbleText) do
-
-
 		Assets.setFont("font14")
 		-- setting alpha is a hack. timeleft starts > 1 but then decreases to zero
 		love.graphics.setColor(251/255, 1, 119/255, v.timeleft)
-		love.graphics.print("$" .. v.text, Cf.round(v.x), Cf.round(v.y))
+		love.graphics.print("$" .. v.text, Cf.round(v.x - 5), Cf.round(v.y))
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 end

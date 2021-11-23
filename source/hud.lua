@@ -80,16 +80,14 @@ local function drawMoney(lander)
 	love.graphics.print("$" .. lander.money, SCREEN_WIDTH - 100, 75)
 end
 
-
-
-
-
-local function drawRangefinder(lander)
--- determine distance to nearest base and draw indicator
+local function newdrawRangefinder(lander)
+	-- determine distance to nearest base and draw indicator
 	local module = Fun.getModule(Enum.moduleRangefinder)
-	if Lander.hasUpgrade(lander, module) then
+	local rawDistance, _ = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
+	local absDistance = math.abs(Cf.round(rawDistance, 0))
 
-		local rawDistance, _ = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
+	--if Lander.hasUpgrade(lander, module) and absDistance > 100 then
+
 		-- limit the rangefinder to a maximum distance
 		if rawDistance < Enum.rangefinderMaximumDistance * -1 then
 			rawDistance = Enum.rangefinderMaximumDistance * -1
@@ -98,23 +96,37 @@ local function drawRangefinder(lander)
 			rawDistance = Enum.rangefinderMaximumDistance
 		end
 
-		local absDistance = math.abs(Cf.round(rawDistance, 0))
+		local halfScreenW = SCREEN_WIDTH / 2
+		local radarRadius = 75
+		-- draw outer circle line
+		love.graphics.setColor(0, 135/255, 36/255, 0.75)
+		love.graphics.circle("line", halfScreenW, SCREEN_HEIGHT * 0.90, radarRadius)
 
-		-- don't draw if close to base
-		if absDistance > 100 then
-			local halfScreenW = SCREEN_WIDTH / 2
-			if rawDistance <= 0 then
-				Assets.setFont("font20")
-				-- closest base is to the right (forward)
-				love.graphics.print("--> " .. absDistance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
-			else
-				love.graphics.print("<-- " .. absDistance, halfScreenW - 75, SCREEN_HEIGHT * 0.90)
-			end
-		end
-	end
+		-- draw 2/3 circle line
+		love.graphics.setColor(0, 135/255, 36/255, 0.75)
+		love.graphics.circle("line", halfScreenW, SCREEN_HEIGHT * 0.90, radarRadius * 0.66)
+
+		-- draw 2/3 circle line
+		love.graphics.setColor(0, 135/255, 36/255, 0.75)
+		love.graphics.circle("line", halfScreenW, SCREEN_HEIGHT * 0.90, radarRadius * 0.33)
+
+		-- draw white dot in middle
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.circle("fill", halfScreenW, SCREEN_HEIGHT * 0.90, 3)
+
+		-- draw big background circle
+		love.graphics.setColor(0, 135/255, 36/255, 0.25)
+		love.graphics.circle("fill", halfScreenW, SCREEN_HEIGHT * 0.90, radarRadius)
+
+		-- draw blip
+		local blipX = halfScreenW - (rawDistance / 4000 * radarRadius)
+		local blipY = SCREEN_HEIGHT * 0.90
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.circle("fill", blipX, SCREEN_HEIGHT * 0.90, 3)
+
+
+	 --end
 end
-
-
 
 local function drawHealthIndicator(lander)
 	-- lander.health reports health from 0 (dead) to 100 (best health)
@@ -256,7 +268,7 @@ function HUD.draw()
 	drawScore()
 	drawOffscreenIndicator(lander)
 	drawMoney(lander)
-	drawRangefinder(lander)
+	newdrawRangefinder(lander)
     drawPortInformation()
 
 	if lander.gameOver then
