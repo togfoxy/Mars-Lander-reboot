@@ -37,6 +37,7 @@ end
 function EnetHandler.createHost()
 -- called by menu
 
+	--server = Sock.newServer("*", 22122)
 	server = Sock.newServer("*", 22122)
 	ENET_IS_CONNECTED = true
 
@@ -99,7 +100,7 @@ function EnetHandler.createClient()
 
 	LovelyToasts.show("Trying to connect on " .. GAME_SETTINGS.hostIP,3, "middle")
 
-	client = Sock.newClient(GAME_SETTINGS.hostIP, 22122)
+	client = Sock.newClient(GAME_SETTINGS.hostIP, tonumber(GAME_SETTINGS.hostPort))
 
 	-- these are all the types of messages the client could receive from the host
 
@@ -133,9 +134,6 @@ function EnetHandler.createClient()
 			end
 			if isLanderFound == false then
 				table.insert(LANDERS, peerLander)
-
-print(#LANDERS)
-
 			else
 				LANDERS[myindex] = peerLander
 			end

@@ -54,9 +54,9 @@ end
 
 
 local function landerHasFuelToThrust(lander, dt)
--- returns true if the lander has enough fuel for thrust
--- returns false if not enough fuel to thrust
--- Note: fuel can be > 0 but still not enough to thrust
+	-- returns true if the lander has enough fuel for thrust
+	-- returns false if not enough fuel to thrust
+	-- Note: fuel can be > 0 but still not enough to thrust
 
 	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleEfficientThrusters))
 	if (lander.fuel - dt) >= 0 or (hasThrusterUpgrade and (lander.fuel - (dt * 0.80)) >= 0) then
@@ -69,7 +69,7 @@ end
 
 
 local function parachuteIsDeployed(lander)
--- return true if lander has a parachute and it is deployed
+	-- return true if lander has a parachute and it is deployed
 
 	for _, moduleItem in pairs(lander.modules) do
 		if moduleItem.id == Enum.moduleParachute then
@@ -84,8 +84,8 @@ end
 
 
 local function deployParachute(lander)
--- sets the 'deployed' status of parachute
--- assumes the lander has a parachute
+	-- sets the 'deployed' status of parachute
+	-- assumes the lander has a parachute
 
 	for _, moduleItem in pairs(lander.modules) do
 		if moduleItem.id == Enum.moduleParachute then
@@ -138,7 +138,7 @@ end
 
 
 local function thrustLeft(lander, dt)
--- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
+	-- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
 	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleSideThrusters)) and landerHasFuelToThrust(lander, dt) then
 		local forceX = 0.5 * dt
 		lander.vx = lander.vx - forceX
@@ -257,7 +257,7 @@ local function checkForDamage(lander)
 end
 
 local function createBubbleText(lander, text)
--- creates a bubble object and adds it to the bubble table for Drawing
+	-- creates a bubble object and adds it to the bubble table for Drawing
 	local myBubble = {}
 	myBubble.text = text
 	myBubble.timeleft = 4	-- bubble will last 4 seconds
@@ -412,14 +412,14 @@ end
 
 
 local function altitude(lander)
--- returns the lander's distance above the ground
+	-- returns the lander's distance above the ground
 	local landerYValue = lander.y
 	local groundYValue = GROUND[Cf.round(lander.x,0)]
 	return groundYValue - landerYValue
 end
 
 local function drawBubbleText()
--- draws bubbles
+	-- draws bubbles
 	for k,v in pairs(bubbleText) do
 		Assets.setFont("font14")
 		-- setting alpha is a hack. timeleft starts > 1 but then decreases to zero
@@ -430,7 +430,7 @@ local function drawBubbleText()
 end
 
 local function updateBubbleText(dt)
--- apply dt to bubbles so they expire
+	-- apply dt to bubbles so they expire
 
 	for k,v in pairs(bubbleText) do
 		v.timeleft = v.timeleft - dt
@@ -495,8 +495,8 @@ end
 
 
 function Lander.reset(lander)
--- resets a single lander. Used in multiplayer mode when you don't want to reset every lander.
--- this function largely follows same behaviour as the CREATE function
+	-- resets a single lander. Used in multiplayer mode when you don't want to reset every lander.
+	-- this function largely follows same behaviour as the CREATE function
 
 	lander.x = Cf.round(ORIGIN_X,0)
 	lander.y = GROUND[lander.x] - 8
@@ -569,8 +569,8 @@ end
 
 
 function Lander.hasUpgrade(lander, module)
-	for i = 1, #lander.modules do
-		if lander.modules[i] == module then
+	for k, landerModule in pairs(lander.modules) do
+		if landerModule.id == module.id then
 			return true
 		end
 	end
@@ -580,10 +580,9 @@ end
 
 
 local function updateScore(lander)
--- updates the lander score that is saved in the lander table
+	-- updates the lander score that is saved in the lander table
 -- this is the same as functions.CalculateScore(). Intention is to deprecate and remove that function and use this.
 -- this procedure does not return the score. It updates the lander table
-
 	lander.score = lander.x - ORIGIN_X
 
 	if lander.score > GAME_SETTINGS.HighScore then
