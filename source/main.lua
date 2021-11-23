@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "0.12"
+GAME_VERSION = "0.13"
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -134,9 +134,12 @@ HOST_IP_ADDRESS = ""
 -- ~~~~~~~~~~~~~~~
 
 local strCurrentScreen
-local background = Assets.getImageSet("background1")
-
-
+-- local background = Assets.getImageSet("background1")
+local background = Assets.getImageSet("bg_space_seamless_2")
+local fground1a = Assets.getImageSet("bd_space_seamless_fl1")
+local fground1b = Assets.getImageSet("bd_space_seamless_fl1")
+local fground2a = Assets.getImageSet("bg_space_seamless_fl2")
+local fground2b = Assets.getImageSet("bg_space_seamless_fl2")
 
 -- ~~~~~~~~~~~~~~~~
 -- Local functions
@@ -150,15 +153,37 @@ local function drawWallpaper()
 
 	local sx = screenwidth / background.width
 	local sy = screenheight / background.height
-	love.graphics.setColor(1, 1, 1, 0.25)
+	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(background.image, 0, 0, 0, sx, sy)
+
+	-- draw two fground1 side by side for parallax effect
+	-- fground1 has two images side by Side
+	-- this is fground1A and fground1B
+	-- fground1A has an x value and fground1B has an
+	local fground1aX = 0
+	local fground1bX = screenwidth
+
+	fground1aX = fground1aX - (WORLD_OFFSET / 25)
+	fground1aX = fground1aX % (-1 * screenwidth)
+	fground1bX = fground1aX + (fground1a.width * sx)
+
+	love.graphics.draw(fground1a.image, fground1aX, 0, 0, sx, sy)
+	love.graphics.draw(fground1b.image, fground1bX, 0, 0, sx, sy)
+
+	-- do the same for fground2
+	local fground2aX = 0
+	local fground2bX = screenwidth
+
+	fground2aX = fground2aX - (WORLD_OFFSET / 10)
+	fground2aX = fground2aX % (-1 * screenwidth)
+	fground2bX = fground2aX + (fground2a.width * sx)
+
+	love.graphics.draw(fground2a.image, fground2aX, 0, 0, sx, sy)
+	love.graphics.draw(fground2b.image, fground2bX, 0, 0, sx, sy)
+
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-
-
--- TODO: Add some sort of gamestate manager
--- Used to be able to draw in pause AND world screen
 local function drawWorld()
 	-- draw the surface
 	Terrain.draw()

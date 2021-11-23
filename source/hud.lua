@@ -86,7 +86,7 @@ local function newdrawRangefinder(lander)
 	local rawDistance, _ = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
 	local absDistance = math.abs(Cf.round(rawDistance, 0))
 
-	--if Lander.hasUpgrade(lander, module) and absDistance > 100 then
+	if Lander.hasUpgrade(lander, module) and absDistance > 100 then
 
 		-- limit the rangefinder to a maximum distance
 		if rawDistance < Enum.rangefinderMaximumDistance * -1 then
@@ -123,9 +123,7 @@ local function newdrawRangefinder(lander)
 		local blipY = SCREEN_HEIGHT * 0.90
 		love.graphics.setColor(1, 1, 1, 1)
 		love.graphics.circle("fill", blipX, SCREEN_HEIGHT * 0.90, 3)
-
-
-	 --end
+	end
 end
 
 local function drawHealthIndicator(lander)
