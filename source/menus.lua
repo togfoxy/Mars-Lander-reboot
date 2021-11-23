@@ -317,10 +317,6 @@ function Menus.DrawSettingsMenu()
 			GAME_CONFIG.allowParachutes = not GAME_CONFIG.allowParachutes
 		end
 
-		if Slab.CheckBox(GAME_CONFIG.useAdvancedPhysics, "Use advanced physics") then
-			GAME_CONFIG.useAdvancedPhysics = not GAME_CONFIG.useAdvancedPhysics
-		end
-
 		if Slab.CheckBox(GAME_CONFIG.music, "Music (needs restart)") then
 			GAME_CONFIG.music = not GAME_CONFIG.music
 		end
