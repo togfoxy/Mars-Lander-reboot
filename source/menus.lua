@@ -97,7 +97,7 @@ function Menus.DrawMainMenu()
 			Slab.Text("Join on IP:")
 			local joinIPOptions = {
 				ReturnOnText=true,
-				W=100,
+				W=150,
 				Text=GAME_SETTINGS.hostIP,
 				NumbersOnly=false,
 				NoDrag=true,
@@ -109,7 +109,7 @@ function Menus.DrawMainMenu()
 			Slab.Text("Join on port:" )
 			local joinPortOptions = {
 				ReturnOnText=true,
-				W=100,
+				W=150,
 				Text=GAME_SETTINGS.hostPort,
 				NumbersOnly=true,
 				NoDrag=true,
