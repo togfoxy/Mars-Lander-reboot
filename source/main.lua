@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "0.13"
+GAME_VERSION = "0.13a"
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -44,6 +44,10 @@ Sock = require 'lib.sock'
 
 -- https://github.com/Loucee/Lovely-Toasts
 LovelyToasts = require 'lib.lovelyToasts'
+
+-- https://gist.github.com/Vovkiv/c1b3216a07ec642c017200d571a35cc8
+local aspect = require("lib.aspect")
+
 
 -- Common functions
 Cf = require 'lib.commonfunctions'
@@ -221,8 +225,6 @@ function love.load()
 		love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
     end
 
-
-
 	local socket = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = socket.dns.toip(socket.dns.gethostname())
 
@@ -240,8 +242,10 @@ function love.load()
 	end
 
 	-- Restore full screen setting
-	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
-
+	-- love.window.setFullscreen(GAME_SETTINGS.FullScreen)
+	aspect.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
+	aspect.setColor(1, 0.3, 0.9, 1)
+	
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
 
@@ -284,15 +288,20 @@ function love.update(dt)
 
 	-- can potentially move this with the Slab.Update as it is only used on the main menu
 	LovelyToasts.update(dt)
+	
+	aspect.update()
 end
 
 
 
 function love.draw()
+
 	-- this comes BEFORE the TLfres.beginRendering
 	drawWallpaper()
 
-	TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
+	-- TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
+	aspect.start()
+
 
 	strCurrentScreen = Fun.CurrentScreenName()
 
@@ -324,7 +333,8 @@ function love.draw()
 	--* Put this AFTER the slab so that it draws over the slab
 	LovelyToasts.draw()
 
-	TLfres.endRendering({0, 0, 0, 1})
+	-- TLfres.endRendering({0, 0, 0, 1})
+	aspect.stop()                                                                                                                                                 
 end
 
 
