@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "0.13"
+GAME_VERSION = "1.00"
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -15,8 +15,8 @@ io.stdout:setvbuf("no")
 DEBUG = true
 
 -- Global screen dimensions
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1080
+SCREEN_WIDTH = 1920 -- 780-- 1920
+SCREEN_HEIGHT = 1080 -- 430--
 
 
 

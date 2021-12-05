@@ -37,8 +37,8 @@ end
 function EnetHandler.createHost()
 -- called by menu
 
-	--server = Sock.newServer("*", 22122)
 	server = Sock.newServer("*", 22122)
+	-- server = Sock.newServer("0.0.0.0", 22122)
 	ENET_IS_CONNECTED = true
 
     -- Called when receiving a message of type "connect"
