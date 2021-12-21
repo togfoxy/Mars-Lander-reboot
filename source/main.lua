@@ -17,8 +17,8 @@ DEBUG = true
 -- Global screen dimensions
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
-W = function() return SCREEN_WIDTH end
-H = function() return SCREEN_HEIGHT end
+-- W = function() return SCREEN_WIDTH end
+-- H = function() return SCREEN_HEIGHT end
 
 
 -- ~~~~~~~~~~~
