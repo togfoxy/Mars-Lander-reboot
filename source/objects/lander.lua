@@ -435,7 +435,13 @@ local function drawGuidance(lander)
 		local x = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
 		local y = lander.y + (lander.vy * lookahead)
 
-		love.graphics.circle("fill", x, y, 5)
+		-- love.graphics.circle("fill", x, y, 5)
+		-- draw a little cross-hair symbol
+		love.graphics.line(x - 7, y, x - 2, y)
+		love.graphics.line(x + 7, y, x + 2, y)
+		love.graphics.line(x, y - 7, x, y - 2)
+		love.graphics.line(x, y + 7, x, y + 2)
+
 	end
 end
 
