@@ -5,10 +5,11 @@ All notable changes to this project should be documented in this file.
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
 
-## v0.12 - UNRELEASED
+## v1.01
 
 ### Added
 
+- Android compatible thanks to @gunroar:cannon()
 - the 'R'eset key is disabled in mplayer mode. Use the new enter/return key to reset a single lander
 - disabled load/save when in multiplayer mode
 - can now buy a parachute module. Deploys automatically. Use the side thruster keys (q/e) to steer. Single use.
