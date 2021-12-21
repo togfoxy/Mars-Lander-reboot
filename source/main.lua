@@ -5,7 +5,8 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "1.00"
+GAME_VERSION = "1.01"
+
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -15,9 +16,10 @@ io.stdout:setvbuf("no")
 DEBUG = true
 
 -- Global screen dimensions
-SCREEN_WIDTH = 1920 -- 780-- 1920
-SCREEN_HEIGHT = 1080 -- 430--
-
+SCREEN_WIDTH = 1920
+SCREEN_HEIGHT = 1080
+-- W = function() return SCREEN_WIDTH end
+-- H = function() return SCREEN_HEIGHT end
 
 
 -- ~~~~~~~~~~~
@@ -28,7 +30,7 @@ Inspect = require 'lib.inspect'
 -- https://github.com/kikito/inspect.lua
 
 -- https://love2d.org/wiki/TLfres
-TLfres = require 'lib.tlfres'
+-- TLfres = require 'lib.tlfres'
 
 -- https://github.com/coding-jackalope/Slab/wiki
 Slab = require 'lib.Slab.Slab'
@@ -45,13 +47,22 @@ Sock = require 'lib.sock'
 -- https://github.com/Loucee/Lovely-Toasts
 LovelyToasts = require 'lib.lovelyToasts'
 
+-- Gunroar's modified paddy.lua
+_class = require 'lib.class'
+Paddy = require 'lib.paddy'
+
+-- https://gist.github.com/Vovkiv/c1b3216a07ec642c017200d571a35cc8
+-- Global for paddy.lua
+aspect = require("lib.aspect")
+
 -- Common functions
 Cf = require 'lib.commonfunctions'
 
 -- Our asset-loader
 Assets = require 'lib.assetloader'
 
-
+-- Gunroar's cheap OS check
+OS = require 'lib.oscheck'
 
 -- ~~~~~~~~
 -- Assets
@@ -204,6 +215,8 @@ end
 -- ~~~~~~~~~~~~~~~
 
 function love.load()
+
+
     if love.filesystem.isFused() then
 
 		-- nullify the assert function for performance reasons
@@ -220,8 +233,6 @@ function love.load()
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
 		love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
     end
-
-
 
 	local socket = require 'socket'	-- socket is native to LOVE but needs a REQUIRE
 	HOST_IP_ADDRESS = socket.dns.toip(socket.dns.gethostname())
@@ -240,10 +251,22 @@ function love.load()
 	end
 
 	-- Restore full screen setting
-	love.window.setFullscreen(GAME_SETTINGS.FullScreen)
+	-- love.window.setFullscreen(GAME_SETTINGS.FullScreen)
+	aspect.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
+	aspect.setColor(0, 0, 0, 1)
 
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
+
+
+    -- Need to make canvas in or after love.load
+    if PADDY then
+        local self = PADDY
+
+        self.dpad.canvas = love.graphics.newCanvas(self.dpad.w,self.dpad.h)
+        self.buttons.canvas = love.graphics.newCanvas(self.buttons.w,self.buttons.h)
+
+    end
 
 	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
 	Terrain.init()
@@ -261,38 +284,14 @@ function love.load()
 	Slab.Initialize()
 end
 
-
-
-function love.update(dt)
-
-	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
-
-	if strCurrentScreen == "MainMenu"
-	or strCurrentScreen == "Credits"
-	or strCurrentScreen == "Settings" then
-		Slab.Update(dt)
-	end
-
-	if strCurrentScreen == "World" then
-		Lander.update(LANDERS[1], dt)
-		Smoke.update(dt)
-		Base.update(dt)
-		Building.update(dt)
-	end
-
-	EnetHandler.update(dt)
-
-	-- can potentially move this with the Slab.Update as it is only used on the main menu
-	LovelyToasts.update(dt)
-end
-
-
-
 function love.draw()
+
 	-- this comes BEFORE the TLfres.beginRendering
 	drawWallpaper()
 
-	TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
+	-- TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
+	aspect.start()
+
 
 	strCurrentScreen = Fun.CurrentScreenName()
 
@@ -321,13 +320,16 @@ function love.draw()
 	--! can this be in an 'if' statement and not drawn if not on a SLAB screen?
 	Slab.Draw()
 
+	if PADDY then
+	    PADDY:draw()
+	end
+
 	--* Put this AFTER the slab so that it draws over the slab
 	LovelyToasts.draw()
 
-	TLfres.endRendering({0, 0, 0, 1})
+	-- TLfres.endRendering({0, 0, 0, 1})
+	aspect.stop()
 end
-
-
 
 function love.keypressed(key, scancode, isrepeat)
 	-- Back to previous screen
@@ -357,8 +359,40 @@ function love.keypressed(key, scancode, isrepeat)
 		if key == "p" then
 			Fun.RemoveScreen()
 		end
+	elseif strCurrentScreen == "Settings" then
+		if key == "o" then
+			Fun.RemoveScreen()
+		end
 	end
 
+end
 
+function love.update(dt)
 
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
+
+	if strCurrentScreen == "MainMenu"
+	or strCurrentScreen == "Credits"
+	or strCurrentScreen == "Settings" then
+		Slab.Update(dt)
+	end
+
+	if strCurrentScreen == "World" or strCurrentScreen == "Pause" or strCurrentScreen == "Settings"then
+	    if PADDY then
+	        PADDY:update(dt)
+	    end
+		if strCurrentScreen == "World" then
+			Lander.update(LANDERS[1], dt)
+			Smoke.update(dt)
+			Base.update(dt)
+			Building.update(dt)
+		end
+	end
+
+	EnetHandler.update(dt)
+
+	-- can potentially move this with the Slab.Update as it is only used on the main menu
+	LovelyToasts.update(dt)
+
+	aspect.update()
 end
