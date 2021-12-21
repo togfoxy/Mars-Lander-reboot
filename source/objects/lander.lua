@@ -431,11 +431,10 @@ local function drawGuidance(lander)
 
 	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleGuidance)) then
 
-		local lookahead = 60		-- how many seconds to look ahead
+		local lookahead = 60		-- how far to look ahead
 		local x = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
 		local y = lander.y + (lander.vy * lookahead)
 
-		-- love.graphics.circle("fill", x, y, 5)
 		-- draw a little cross-hair symbol
 		love.graphics.line(x - 7, y, x - 2, y)
 		love.graphics.line(x + 7, y, x + 2, y)
