@@ -23,8 +23,6 @@ function functions.configureModules()
 	for _,module in pairs(SHOP_MODULES) do
 		if module.id == Enum.moduleParachute then
 			module.allowed = GAME_CONFIG.allowParachutes
-print(module.allowed)
-
 		end
 	end
 end
