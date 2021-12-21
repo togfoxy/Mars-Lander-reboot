@@ -7,6 +7,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 ## unreleased
 
 ### Added
+- a new 'guidance unit' upgrade
 
 ### Changed
 
@@ -18,7 +19,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ### Added
 
-- Android compatible thanks to @gunroar:cannon()
+- android compatible thanks to @gunroar:cannon()
 - the 'R'eset key is disabled in mplayer mode. Use the new enter/return key to reset a single lander
 - disabled load/save when in multiplayer mode
 - can now buy a parachute module. Deploys automatically. Use the side thruster keys (q/e) to steer. Single use.
