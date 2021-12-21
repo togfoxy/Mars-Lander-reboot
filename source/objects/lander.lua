@@ -429,11 +429,14 @@ end
 local function drawGuidance(lander)
 	-- draw the pointer thingy that shows where the lander is moving
 
-	local lookahead = 60		-- how many seconds to look ahead
-	local x = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
-	local y = lander.y + (lander.vy * lookahead)
+	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleGuidance)) then
 
-	love.graphics.circle("fill", x, y, 5)
+		local lookahead = 60		-- how many seconds to look ahead
+		local x = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
+		local y = lander.y + (lander.vy * lookahead)
+
+		love.graphics.circle("fill", x, y, 5)
+	end
 end
 
 -- ~~~~~~~~~~~~~~~~~

@@ -49,6 +49,14 @@ function NewModules.createModules()
     myModule.deployed = false
     myModule.allowed = true
     table.insert(SHOP_MODULES, myModule)
+
+    myModule = {}
+    myModule.id = Enum.moduleGuidance
+    myModule.name = "Guidance unit"
+    myModule.cost = 150
+    myModule.mass = 5
+    myModule.allowed = true
+    table.insert(SHOP_MODULES, myModule)
 end
 
 return NewModules
