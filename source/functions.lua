@@ -326,4 +326,11 @@ function functions.getActiveModuleIndexFromSequence(indexNumber)
 	return nil
 end
 
+function functions.getAltitude(lander)
+	-- returns the lander's distance above the ground
+	local landerYValue = lander.y
+	local groundYValue = GROUND[Cf.round(lander.x,0)]
+	return groundYValue - landerYValue
+end
+
 return functions

@@ -99,6 +99,7 @@ Cobjs		= require 'createobjects'
 Fun			= require 'functions'
 Menus		= require 'menus'
 EnetHandler = require 'enetstuff'
+AI 			= require 'ai'
 
 
 
@@ -399,6 +400,7 @@ function love.update(dt)
 
 	-- can potentially move this with the Slab.Update as it is only used on the main menu
 	LovelyToasts.update(dt)
+	AI.update(LANDERS[1], dt)
 
 	Aspect.update()
 end
