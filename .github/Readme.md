@@ -26,6 +26,10 @@ Go to the RELEASES page: https://github.com/togfoxy/Mars-Lander-reboot/releases
 
 Expand the ASSETS drop down for the latest release
 
+Also on ITCH.IO
+
+https://togfox.itch.io/mars-lander
+
 ### Windows first time install:
 
 - download the zip file

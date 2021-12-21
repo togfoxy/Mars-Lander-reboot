@@ -51,61 +51,64 @@ aspect.getWindow = function() -- get window's width and height
 end
 
 aspect.update = function()
-  local x1, y1, w1, h1, x2, y2, w2, h2 -- coordinates for black bars
-  local scale
-  local xOff, yOff
-  local barWidth, barHeight -- decrease calculations
+    local x1, y1, w1, h1, x2, y2, w2, h2
+    local scale
+    local xOff, yOff
+    local a_ -- used to decrease calculations
 
-  local gameWidth, gameHeight = aspect.gameWidth, aspect.gameHeight
-  local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
+    local gameWidth, gameHeight = aspect.gameWidth, aspect.gameHeight
+    local windowWidth, windowHeight = love.graphics.getWidth(), love.graphics.getHeight()
 
-  local gameAspect = gameWidth / gameHeight
-  local windowAspect = windowWidth / windowHeight
+    local gameAspect = gameWidth / gameHeight
+    local windowAspect = windowWidth / windowHeight
 
-  if gameAspect > windowAspect then -- if window height > game height; create black bars on top and bottom
-    scale = windowWidth / gameWidth
-    barHeight = math.abs((gameHeight * scale - windowHeight) / 2)
-    x1, y1, w1, h1 = 0, 0, windowWidth, barHeight
-    x2, y2, w2, h2 = 0, windowHeight, windowWidth, barHeight * -1
-    xOff, yOff = 0, windowHeight / 2 - (scale * gameHeight) / 2
+    if gameAspect > windowAspect then -- if window height > game height
+        scale = windowWidth / gameWidth
+        a_ = math.abs((gameHeight * scale - windowHeight) / 2)
+        x1, y1, w1, h1 = 0, 0, windowWidth, a_
+        x2, y2, w2, h2 = 0, windowHeight, windowWidth, -a_
+        xOff, yOff = 0, windowHeight / 2 - (scale * gameHeight) / 2
 
-  elseif gameAspect < windowAspect then -- if window width > game width; create bars on left and right
-    scale = windowHeight / gameHeight
-    barWidth = math.abs((gameWidth * scale - windowWidth) / 2)
-    x1, y1, w1, h1 = 0, 0, barWidth, windowHeight
-    x2, y2, w2, h2 = windowWidth, 0, barWidth * -1, windowHeight
-    xOff, yOff = windowWidth / 2 - (scale * gameWidth) / 2, 0
+    elseif gameAspect < windowAspect then -- if window width > game width
+        scale = windowHeight / gameHeight
+        a_ = math.abs((gameWidth * scale - windowWidth) / 2)
+        x1, y1, w1, h1 = 0, 0, a_, windowHeight
+        x2, y2, w2, h2 = windowWidth, 0, -a_, windowHeight
+        xOff, yOff = windowWidth / 2 - (scale * gameWidth) / 2, 0
 
-  else -- if window's and game's size equal
-    scale = windowWidth / gameWidth
-    x1, y1, w1, h1 = 0, 0, 0, 0
-    x2, y2, w2, h2 = 0, 0, 0, 0
-    xOff, yOff = 0, 0
-  end
-  
-  -- update values inside library
-  aspect.x1, aspect.y1, aspect.w1, aspect.h1 = x1, y1, w1, h1
-  aspect.x2, aspect.y2, aspect.w2, aspect.h2 = x2, y2, w2, h2
-  aspect.xOff, aspect.yOff = xOff, yOff
-  aspect.scale = scale
-  aspect.windowWidth, aspect.windowHeight = windowWidth, windowHeight
-  aspect.gameAspect, aspect.windowAspect = gameAspect, windowAspect
+    else -- if window and game size equal
+        scale = windowWidth / gameWidth
+        x1, y1, w1, h1 = 0, 0, 0, 0
+        x2, y2, w2, h2 = 0, 0, 0, 0
+        xOff, yOff = 0, 0
+    end
+
+    aspect.x1, aspect.y1, aspect.w1, aspect.h1 = x1, y1, w1, h1
+    aspect.x2, aspect.y2, aspect.w2, aspect.h2 = x2, y2, w2, h2
+    aspect.xOff, aspect.yOff = xOff, yOff
+    aspect.scale = scale
+    aspect.windowWidth, aspect.windowHeight = windowWidth, windowHeight
+    aspect.gameAspect, aspect.windowAspect = gameAspect, windowAspect
 end
 
 aspect.start = function()
-  love.graphics.push("all") -- https://www.love2d.org/wiki/StackType
-  love.graphics.translate(aspect.xOff, aspect.yOff) -- create offset, based on black bars width and height
-  love.graphics.scale(aspect.scale, aspect.scale)
+    love.graphics.push()
+    love.graphics.translate(aspect.xOff, aspect.yOff) -- create offset of graphics
+    local scale = aspect.scale
+    love.graphics.scale(scale, scale)
 end
 
 aspect.stop = function()
-  love.graphics.pop()
+    love.graphics.pop()
 
-  love.graphics.push("all") -- https://www.love2d.org/wiki/StackType
-  love.graphics.setColor(aspect.a, aspect.g, aspect.b, aspect.a)
-  love.graphics.rectangle("fill", aspect.x1, aspect.y1, aspect.w1, aspect.h1) -- left or top most
-  love.graphics.rectangle("fill", aspect.x2, aspect.y2, aspect.w2, aspect.h2) --  right or bottom most
-  love.graphics.pop()
+    love.graphics.push("all") -- "all" used here to return original colors after stop function
+    local r, g, b, a = aspect.r, aspect.g, aspect.b, aspect.a
+    local x1, y1, w1, h1 = aspect.x1, aspect.y1, aspect.w1, aspect.h1
+    local x2, y2, w2, h2 = aspect.x2, aspect.y2, aspect.w2, aspect.h2
+    love.graphics.setColor(r, g, b, a)
+    love.graphics.rectangle("fill", x1, y1, w1, h1)
+    love.graphics.rectangle("fill", x2, y2, w2, h2)
+    love.graphics.pop()
 end
 
 aspect.toGame = function(x, y) -- thanslate coordinates from non-scaled to scaled;
