@@ -6,9 +6,12 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ## unreleased
 
+### Added
+
 ### Changed
-- menu configuration to fit landscape android
-- updated credits
+
+### Fixed
+
 
 
 ## v1.01
@@ -24,15 +27,19 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 - expanded the settings slab window to accommodate game options
 - easy mode prevents negative cash balance and starts with a lot of money
 - lander now has animated legs
+- shop menu now clickable
 
 ### Changed
 - lander image
+- menu configuration to fit landscape android
+- updated credits
 
 ### Fixed
 - fix background drawn wrong on full screen
 - Fixed assets not being checked for supported file types
 - restored the high score that somehow got removed
 - removed unused audio files
+- a bug where the game settings were not used until the next game session
 
 ## v0.11
 ### Added
