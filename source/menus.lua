@@ -187,7 +187,7 @@ function Menus.DrawCredits()
 
 		Slab.BeginLayout('credits-top', {AlignX = 'center'})
 			Slab.Text("Mars Lander")
-			Slab.Text("Github Repository", URLOptions("https://github.com/togfoxy/Mars-Lander-reboot"))
+			Slab.Text("Github Repository", URLOptions("https://github.com/togfoxy/MarsLander"))
 			Slab.Text("A Love2D community project")
 			Slab.Separator()
 		Slab.EndLayout()
