@@ -376,7 +376,9 @@ end
 
 
 local function buyModule(module, lander)
-	-- Enough money to purchase the module ?
+	-- receives the module object
+	-- Enough money to purchase the module
+	-- checks if module is allowed
 	if module.allowed == nil or module.allowed == true then
 		if lander.money >= module.cost then
 			if Lander.hasUpgrade(lander, module) then
@@ -715,11 +717,9 @@ function Lander.keypressed(key, scancode, isrepeat)
 
 	-- TODO: simplify this code
 	if key ~= nil and tonumber(key) ~= nil then
-		if tonumber(key) > 0 then
+		if tonumber(key) > 0 and tonumber(key) <= #SHOP_MODULES then
 			if Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
-				if tonumber(key) <= #SHOP_MODULES then
-					buyModule(SHOP_MODULES[tonumber(key)], lander)
-				end
+				buyModule(SHOP_MODULES[tonumber(key)], lander)
 			end
 		end
 	end
