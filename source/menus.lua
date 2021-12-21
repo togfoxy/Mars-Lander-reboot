@@ -3,8 +3,8 @@ local Menus = {}
 
 function Menus.DrawMainMenu()
 
-	local intSlabWidth = 700 -- the width of the main menu slab. Change this to change appearance.
-	local intSlabHeight = 550 	-- the height of the main menu slab
+	local intSlabWidth = 775 -- the width of the main menu slab. Change this to change appearance.
+	local intSlabHeight = 300 	-- the height of the main menu slab
 	local fltSlabWindowX = love.graphics.getWidth() / 2 - intSlabWidth / 2
 	local fltSlabWindowY = love.graphics.getHeight() / 2 - intSlabHeight / 2
 
@@ -24,10 +24,10 @@ function Menus.DrawMainMenu()
 	}
 
 	Slab.BeginWindow('MainMenu', mainMenuOptions)
-	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 2})
+	Slab.BeginLayout("MMLayout",{AlignX="center",AlignY="center",AlignRowY="center",ExpandW=false,Columns = 3})
 
 		Slab.SetLayoutColumn(1)
-		Slab.Image('MyImage', {Image = Assets.getImage("clipartLander"), Scale=0.4})
+		Slab.Image('MyImage', {Image = Assets.getImage("clipartLander"), Scale=0.3})
 
 		Slab.SetLayoutColumn(2)
 
@@ -74,8 +74,13 @@ function Menus.DrawMainMenu()
 		if Slab.Button("Settings",{W=155}) then
 			Fun.AddScreen("Settings")
 		end
-		Slab.NewLine()
 
+
+		Slab.SetLayoutColumn(3)
+
+		Slab.NewLine()
+		-- Slab.NewLine()
+		Slab.NewLine()
 		if not ENET_IS_CONNECTED then
 			if Slab.Button("Host game",{W=155}) then
 				IS_A_CLIENT = false
@@ -216,14 +221,15 @@ function Menus.DrawCredits()
 			Slab.NewLine()
 			Slab.Text("Love2D", URLOptions("https://love2d.org"))
 			Slab.Text("SLAB for Love2D", URLOptions("https://github.com/coding-jackalope/Slab"))
-			Slab.Text("tlsfres", URLOptions("https://love2d.org/wiki/TLfres"))
+			Slab.Text("aspect", URLOptions("https://love2d.org/forums/viewtopic.php?f=5&p=245515#p245515"))
 			Slab.Text("inspect", URLOptions("https://github.com/kikito/inspect.lua"))
 			Slab.Text("freesound.org", URLOptions("https://freesound.org/"))
-			Slab.Text("Kenney.nl", URLOptions("https://kenney.nl"))
 			Slab.Text("bitser", URLOptions("https://github.com/gvx/bitser"))
 			Slab.Text("nativefs", URLOptions("https://github.com/megagrump/nativefs"))
 			Slab.Text("anim8", URLOptions("https://github.com/kikito/anim8"))
 			Slab.Text("Lovely-Toasts", URLOptions("https://github.com/Loucee/Lovely-Toasts"))
+			Slab.Text("sock", URLOptions("https://github.com/camchenry/Sock.lua"))
+			Slab.Text("Paddy") -- , URLOptions("https://github.com/camchenry/Sock.lua"))
 
 			Slab.Text("Galactic Pole Position by Eric Matyas. ", URLOptions("www.soundimage.org"))
 

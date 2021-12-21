@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "1.01"
+GAME_VERSION = "1.02"
 
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
@@ -52,7 +52,6 @@ _class = require 'lib.class'
 Paddy = require 'lib.paddy'
 
 -- https://gist.github.com/Vovkiv/c1b3216a07ec642c017200d571a35cc8
--- Global for paddy.lua
 aspect = require("lib.aspect")
 
 -- Common functions
