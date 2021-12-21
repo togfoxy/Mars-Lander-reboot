@@ -89,43 +89,6 @@ local function deployParachute(lander)
 	end
 end
 
-local function doThrust(lander, dt)
-	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleEfficientThrusters))
-	if landerHasFuelToThrust(lander, dt) then
-		local angleRadian = math.rad(lander.angle)
-		local forceX = math.cos(angleRadian) * dt
-		local forceY = math.sin(angleRadian) * dt
-
-		-- adjust the thrust based on ship mass
-		-- less mass = higher ratio = more thrust = less fuel needed to move
-		local massRatio = DEFAULT_MASS / Lander.getMass(lander)
-		-- for debugging only
-		if GAME_CONFIG.showDEBUG then
-			MASS_RATIO = massRatio
-		end
-
-		lander.engineOn = true
-		forceX = forceX * massRatio
-		forceY = forceY * massRatio
-		lander.vx = lander.vx + forceX
-		lander.vy = lander.vy + forceY
-
-		if hasThrusterUpgrade then
-			-- efficient thrusters use 80% fuel compared to normal thrusters
-			lander.fuel = lander.fuel - (dt * 0.80)
-		else
-			lander.fuel = lander.fuel - (dt * 1)
-		end
-
-		-- Add smoke particles if available
-		if Smoke then
-			Smoke.createParticle(lander.x, lander.y, lander.angle)
-		end
-	else
-		-- no fuel to thrust
-		--! probably need to make a serious alert here
-	end
-end
 
 local function thrustLeft(lander, dt)
 	-- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
@@ -571,9 +534,48 @@ function Lander.hasUpgrade(lander, module)
 	return false
 end
 
+function Lander.doThrust(lander, dt)
+	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleEfficientThrusters))
+	if landerHasFuelToThrust(lander, dt) then
+		local angleRadian = math.rad(lander.angle)
+		local forceX = math.cos(angleRadian) * dt
+		local forceY = math.sin(angleRadian) * dt
+
+		-- adjust the thrust based on ship mass
+		-- less mass = higher ratio = more thrust = less fuel needed to move
+		local massRatio = DEFAULT_MASS / Lander.getMass(lander)
+		-- for debugging only
+		if GAME_CONFIG.showDEBUG then
+			MASS_RATIO = massRatio
+		end
+
+		lander.engineOn = true
+		forceX = forceX * massRatio
+		forceY = forceY * massRatio
+		lander.vx = lander.vx + forceX
+		lander.vy = lander.vy + forceY
+
+		if hasThrusterUpgrade then
+			-- efficient thrusters use 80% fuel compared to normal thrusters
+			lander.fuel = lander.fuel - (dt * 0.80)
+		else
+			lander.fuel = lander.fuel - (dt * 1)
+		end
+
+		-- Add smoke particles if available
+		if Smoke then
+			Smoke.createParticle(lander.x, lander.y, lander.angle)
+		end
+	else
+		-- no fuel to thrust
+		--! probably need to make a serious alert here
+	end
+end
+
+
 function Lander.update(lander, dt)
     if keyDown("up") or keyDown("w") or keyDown("kp8") then
-        doThrust(lander, dt)
+        Lander.doThrust(lander, dt)
     end
 	-- rotate the lander anti-clockwise
     if keyDown("left") or keyDown("a") or keyDown("kp4") then
@@ -683,6 +685,10 @@ function Lander.draw()
 			if landerId == 1 then
 				drawGuidance(lander)
 			end
+
+			love.graphics.circle("line", predictedx, predictedy, 5)
+			love.graphics.circle("line", predictedx, perfecty, 10)
+			
 		end
 	end
 end
