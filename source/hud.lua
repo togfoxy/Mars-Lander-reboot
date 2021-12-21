@@ -165,14 +165,43 @@ local function drawShopMenu()
 				end
 				love.graphics.setColor(color)
 				love.graphics.printf(itemListString, 0, y, SCREEN_WIDTH, "center")
+
+				-- print boxes around the menu items
+				--love.graphics.rectangle("line", SCREEN_WIDTH / 2.66, y, SCREEN_WIDTH / 4, 40)
+
 				y = y + 20
-				love.graphics.setColor(1, 1, 1, 1)
+
 			end
+			love.graphics.setColor(1, 1, 1, 1)
 		end
 	end
 end
 
+local function newdrawShopMenu()
+	local gameOver = LANDERS[1].gameOver
+	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], Enum.basetypeFuel)
+	if not gameOver and isOnLandingPad then
+		Assets.setFont("font20")
+		local x = SCREEN_WIDTH / 2.66
+		local y = SCREEN_HEIGHT * 0.33
+		for k,module in ipairs(SHOP_MODULES) do
+			if module.allowed == nil or module.allowed == true then
+				local string = "%s. Buy %s - $%s \n"
+				itemListString = string.format(string, k, module.name, module.cost)
+				local color = {1, 1, 1, 1}
+				if Lander.hasUpgrade(LANDERS[1], module) then
+					color = {.8, .1, .1, .5}
+				end
+				love.graphics.setColor(color)
 
+				love.graphics.rectangle("line", x, y, SCREEN_WIDTH / 4, 45)
+				love.graphics.print(itemListString, x + 30, y + 12)
+
+				y = y + 50
+			end
+		end
+	end
+end
 
 local function drawGameOver()
     Assets.setFont("font16")
@@ -272,7 +301,8 @@ function HUD.draw()
 	if lander.gameOver then
 		drawGameOver()
 	elseif lander.onGround then
-		drawShopMenu()
+		-- drawShopMenu()
+		newdrawShopMenu()
 	end
 
 	if DEBUG then
