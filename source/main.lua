@@ -6,6 +6,7 @@
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 GAME_VERSION = "1.01"
+
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
 -- Directly release messages generated with e.g print for instant feedback
@@ -53,8 +54,6 @@ Paddy = require 'lib.paddy'
 -- https://gist.github.com/Vovkiv/c1b3216a07ec642c017200d571a35cc8
 -- Global for paddy.lua
 aspect = require("lib.aspect")
-
-
 
 -- Common functions
 Cf = require 'lib.commonfunctions'
@@ -328,12 +327,9 @@ function love.draw()
 	--* Put this AFTER the slab so that it draws over the slab
 	LovelyToasts.draw()
 
-
 	-- TLfres.endRendering({0, 0, 0, 1})
 	aspect.stop()
 end
-
-
 
 function love.keypressed(key, scancode, isrepeat)
 	-- Back to previous screen
