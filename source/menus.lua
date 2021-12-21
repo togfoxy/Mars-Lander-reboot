@@ -307,7 +307,7 @@ function Menus.DrawSettingsMenu()
 		Slab.NewLine()
 
 		-- all the configurable options go here
-		-- set default values in setDefaultGameConfigs()
+		-- set default values in Fun.setDefaultGameConfigs()
 		Slab.SetLayoutColumn(2)
 
 		Slab.Textf("Options:")
@@ -325,6 +325,10 @@ function Menus.DrawSettingsMenu()
 
 		if Slab.CheckBox(GAME_CONFIG.music, "Music (needs restart)") then
 			GAME_CONFIG.music = not GAME_CONFIG.music
+		end
+
+		if Slab.CheckBox(GAME_CONFIG.allowGuidance, "Allow guidance") then
+			GAME_CONFIG.allowGuidance = not GAME_CONFIG.allowGuidance
 		end
 		Slab.EndLayout() -- layout-settings
 

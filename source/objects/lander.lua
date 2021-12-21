@@ -51,8 +51,6 @@ local function recalcDefaultMass(lander)
 	return (result + lander.fuelCapacity)
 end
 
-
-
 local function landerHasFuelToThrust(lander, dt)
 	-- returns true if the lander has enough fuel for thrust
 	-- returns false if not enough fuel to thrust
@@ -65,8 +63,6 @@ local function landerHasFuelToThrust(lander, dt)
 		return false
 	end
 end
-
-
 
 local function parachuteIsDeployed(lander)
 	-- return true if lander has a parachute and it is deployed
@@ -81,8 +77,6 @@ local function parachuteIsDeployed(lander)
 	return false
 end
 
-
-
 local function deployParachute(lander)
 	-- sets the 'deployed' status of parachute
 	-- assumes the lander has a parachute
@@ -94,8 +88,6 @@ local function deployParachute(lander)
 		end
 	end
 end
-
-
 
 local function doThrust(lander, dt)
 	local hasThrusterUpgrade = Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleEfficientThrusters))
@@ -135,8 +127,6 @@ local function doThrust(lander, dt)
 	end
 end
 
-
-
 local function thrustLeft(lander, dt)
 	-- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
 	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleSideThrusters)) and landerHasFuelToThrust(lander, dt) then
@@ -158,8 +148,6 @@ local function thrustLeft(lander, dt)
 	end
 end
 
-
-
 local function thrustRight(lander, dt)
 	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleSideThrusters)) and landerHasFuelToThrust(lander, dt) then
 		local forceX = 0.5 * dt
@@ -178,8 +166,6 @@ local function thrustRight(lander, dt)
 		end
 	end
 end
-
-
 
 local function moveShip(lander, dt)
 	lander.x = lander.x + lander.vx
@@ -206,8 +192,6 @@ local function moveShip(lander, dt)
 	end
 end
 
-
-
 local function refuelLander(lander, base, dt)
 	-- drain fuel from the base and add it to the lander
 	-- base is an object/table item from OBJECTS
@@ -218,8 +202,6 @@ local function refuelLander(lander, base, dt)
 	if base.totalFuel <= 0 then base.active = false end
 end
 
-
-
 local function payLanderFromBase(lander, base, baseDistance)
 	-- pay some money based on distance to the base
 	-- base is an object/table item from OBJECTS
@@ -229,8 +211,6 @@ local function payLanderFromBase(lander, base, baseDistance)
 		landingSound:play()
 	end
 end
-
-
 
 local function payLanderForControl(lander, base)
 	if base.paid == false then
@@ -244,8 +224,6 @@ local function payLanderForControl(lander, base)
 		end
 	end
 end
-
-
 
 local function checkForDamage(lander)
 	-- apply damage if vertical speed is too higher
@@ -265,8 +243,6 @@ local function createBubbleText(lander, text)
 	myBubble.y = lander.y - 50
 	table.insert(bubbleText, myBubble)
 end
-
-
 
 local function checkForContact(lander, dt)
 	-- see if lander has contacted the ground
@@ -357,8 +333,6 @@ local function checkForContact(lander, dt)
 	end
 end
 
-
-
 local function playSoundEffects(lander)
 	if lander.engineOn then
 		engineSound:play()
@@ -372,8 +346,6 @@ local function playSoundEffects(lander)
 		lowFuelSound:play()
 	end
 end
-
-
 
 local function buyModule(module, lander)
 	-- receives the module object
@@ -411,8 +383,6 @@ local function buyModule(module, lander)
 	end
 end
 
-
-
 local function altitude(lander)
 	-- returns the lander's distance above the ground
 	local landerYValue = lander.y
@@ -441,6 +411,37 @@ local function updateBubbleText(dt)
 		else
 			v.y = v.y - (dt * 15)	-- bubble floats up
 		end
+	end
+end
+
+local function updateScore(lander)
+	-- updates the lander score that is saved in the lander table
+	-- this is the same as functions.CalculateScore(). Intention is to deprecate and remove that function and use this.
+	-- this procedure does not return the score. It updates the lander table
+	lander.score = lander.x - ORIGIN_X
+
+	if lander.score > GAME_SETTINGS.HighScore then
+		GAME_SETTINGS.HighScore = lander.score
+		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
+	end
+end
+
+local function drawGuidance(lander)
+	-- draw the pointer thingy that shows where the lander is moving
+
+	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleGuidance)) then
+
+		local lookahead = 60		-- how many seconds to look ahead
+		local x = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
+		local y = lander.y + (lander.vy * lookahead)
+
+		-- love.graphics.circle("fill", x, y, 5)
+		-- draw a little cross-hair symbol
+		love.graphics.line(x - 7, y, x - 2, y)
+		love.graphics.line(x + 7, y, x + 2, y)
+		love.graphics.line(x, y - 7, x, y - 2)
+		love.graphics.line(x, y + 7, x, y + 2)
+
 	end
 end
 
@@ -494,8 +495,6 @@ function Lander.create(name)
 	return lander
 end
 
-
-
 function Lander.reset(lander)
 	-- resets a single lander. Used in multiplayer mode when you don't want to reset every lander.
 	-- this function largely follows same behaviour as the CREATE function
@@ -538,8 +537,6 @@ function Lander.reset(lander)
 	lander.modules = {}
 end
 
-
-
 function Lander.getMass(lander)
 	-- return the mass of all the bits on the lander
     local result = 0
@@ -555,8 +552,6 @@ function Lander.getMass(lander)
     return result
 end
 
-
-
 function Lander.isOnLandingPad(lander, baseId)
 	-- returns a true / false value
 
@@ -568,8 +563,6 @@ function Lander.isOnLandingPad(lander, baseId)
     end
 end
 
-
-
 function Lander.hasUpgrade(lander, module)
 	for k, landerModule in pairs(lander.modules) do
 		if landerModule.id == module.id then
@@ -578,22 +571,6 @@ function Lander.hasUpgrade(lander, module)
 	end
 	return false
 end
-
-
-
-local function updateScore(lander)
-	-- updates the lander score that is saved in the lander table
--- this is the same as functions.CalculateScore(). Intention is to deprecate and remove that function and use this.
--- this procedure does not return the score. It updates the lander table
-	lander.score = lander.x - ORIGIN_X
-
-	if lander.score > GAME_SETTINGS.HighScore then
-		GAME_SETTINGS.HighScore = lander.score
-		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
-	end
-end
-
-
 
 function Lander.update(lander, dt)
     if keyDown("up") or keyDown("w") or keyDown("kp8") then
@@ -626,8 +603,6 @@ function Lander.update(lander, dt)
 	updateScore(lander)
 	updateBubbleText(dt)
 end
-
-
 
 function Lander.draw()
 	-- draw the lander and flame
@@ -705,11 +680,13 @@ function Lander.draw()
 
 			-- draw bubble text above lander
 			drawBubbleText(dt)
+
+			if landerId == 1 then
+				drawGuidance(lander)
+			end
 		end
 	end
 end
-
-
 
 function Lander.keypressed(key, scancode, isrepeat)
 	-- Let the player buy upgrades when landed on a fuel base

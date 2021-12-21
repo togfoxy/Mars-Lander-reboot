@@ -11,7 +11,7 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG.useAdvancedPhysics = false
 	GAME_CONFIG.easyMode = false
 	GAME_CONFIG.music = true
-
+	GAME_CONFIG.allowGuidance = true
 end
 
 
@@ -23,8 +23,6 @@ function functions.configureModules()
 	for _,module in pairs(SHOP_MODULES) do
 		if module.id == Enum.moduleParachute then
 			module.allowed = GAME_CONFIG.allowParachutes
-print(module.allowed)
-
 		end
 	end
 end
