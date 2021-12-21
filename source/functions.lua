@@ -1,7 +1,5 @@
 local functions = {}
 
-
-
 local function setDefaultGameConfigs()
 	-- sets all game configs to default settings
 
@@ -14,8 +12,6 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG.allowGuidance = true
 end
 
-
-
 function functions.configureModules()
 	-- modules need to be activated once GAME_SETTINGS is loaded
 	-- cycle through all modules and set ACTIVE on those that are configurable
@@ -26,8 +22,6 @@ function functions.configureModules()
 		end
 	end
 end
-
-
 
 function functions.quitGame()
 	-- cleans up before quiting the game
@@ -47,13 +41,9 @@ function functions.quitGame()
 	love.event.quit()
 end
 
-
-
 function functions.AddScreen(strNewScreen)
 	table.insert(CURRENT_SCREEN, strNewScreen)
 end
-
-
 
 function functions.RemoveScreen()
 	if #CURRENT_SCREEN == 1 then
@@ -66,18 +56,13 @@ function functions.RemoveScreen()
 		Fun.SaveGameSettings()
 		Fun.SaveGameConfig()
 	end
-
 	table.remove(CURRENT_SCREEN)
 end
-
-
 
 function functions.CurrentScreenName()
 	-- returns the current active screen
 	return CURRENT_SCREEN[#CURRENT_SCREEN]
 end
-
-
 
 function functions.SwapScreen(newscreen)
 	-- swaps screens so that the old screen is removed from the stack
@@ -86,8 +71,6 @@ function functions.SwapScreen(newscreen)
     Fun.AddScreen(newscreen)
     table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
 end
-
-
 
 function functions.SaveGameConfig()
 	-- save game settings so they can be autoloaded next session
@@ -100,8 +83,6 @@ function functions.SaveGameConfig()
     serialisedString = Bitser.dumps(GAME_CONFIG)
     success, message = Nativefs.write(savefile, serialisedString )
 end
-
-
 
 function functions.LoadGameConfig()
     local savedir = love.filesystem.getSource()
@@ -120,10 +101,7 @@ function functions.LoadGameConfig()
 
 	-- turn on and off modules
 	Fun.configureModules()
-
 end
-
-
 
 function functions.SaveGameSettings()
 	-- save game settings so they can be autoloaded next session
@@ -136,8 +114,6 @@ function functions.SaveGameSettings()
     serialisedString = Bitser.dumps(GAME_SETTINGS)
     success, message = Nativefs.write(savefile, serialisedString )
 end
-
-
 
 function functions.LoadGameSettings()
 
@@ -180,8 +156,6 @@ function functions.LoadGameSettings()
 	CURRENT_PLAYER_NAME = GAME_SETTINGS.PlayerName
 end
 
-
-
 function functions.SaveGame()
 	-- uses the globals because too hard to pass params
 
@@ -203,10 +177,7 @@ function functions.SaveGame()
     success, message = Nativefs.write(savefile, serialisedString )
 
 	LovelyToasts.show("Game saved",3, "middle")
-
 end
-
-
 
 function functions.LoadGame()
 
@@ -249,8 +220,6 @@ function functions.LoadGame()
 	end
 end
 
-
-
 function functions.CalculateScore()
 	local score = LANDERS[1].x - ORIGIN_X
 
@@ -261,8 +230,6 @@ function functions.CalculateScore()
 
 	return score
 end
-
-
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	-- returns two values: the distance to the closest base, and the object/table item for that base
@@ -295,10 +262,7 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	end
 
 	return  realdist, closestbase
-
 end
-
-
 
 function functions.ResetGame()
 	-- this resets the game for all landers - including multiplayer landers
