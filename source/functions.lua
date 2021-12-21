@@ -3,7 +3,7 @@ local functions = {}
 
 
 local function setDefaultGameConfigs()
--- sets all game configs to default settings
+	-- sets all game configs to default settings
 
 	GAME_CONFIG = {}
 	GAME_CONFIG.showDEBUG = false
@@ -16,13 +16,15 @@ end
 
 
 
-local function configureModules()
--- modules need to be activated once GAME_SETTINGS is loaded
--- cycle through all modules and set ACTIVE on those that are configurable
+function functions.configureModules()
+	-- modules need to be activated once GAME_SETTINGS is loaded
+	-- cycle through all modules and set ACTIVE on those that are configurable
 
 	for _,module in pairs(SHOP_MODULES) do
 		if module.id == Enum.moduleParachute then
 			module.allowed = GAME_CONFIG.allowParachutes
+print(module.allowed)
+
 		end
 	end
 end
@@ -30,7 +32,7 @@ end
 
 
 function functions.quitGame()
--- cleans up before quiting the game
+	-- cleans up before quiting the game
 
 	if ENET_IS_CONNECTED then
 		-- test if pressing ESC on main screen (i.e. quiting)
@@ -73,15 +75,15 @@ end
 
 
 function functions.CurrentScreenName()
--- returns the current active screen
+	-- returns the current active screen
 	return CURRENT_SCREEN[#CURRENT_SCREEN]
 end
 
 
 
 function functions.SwapScreen(newscreen)
--- swaps screens so that the old screen is removed from the stack
--- this adds the new screen then removes the 2nd last screen.
+	-- swaps screens so that the old screen is removed from the stack
+	-- this adds the new screen then removes the 2nd last screen.
 
     Fun.AddScreen(newscreen)
     table.remove(CURRENT_SCREEN, #CURRENT_SCREEN - 1)
@@ -90,7 +92,7 @@ end
 
 
 function functions.SaveGameConfig()
--- save game settings so they can be autoloaded next session
+	-- save game settings so they can be autoloaded next session
 	local savefile
 	local serialisedString
 	local success, message
@@ -119,14 +121,14 @@ function functions.LoadGameConfig()
 	end
 
 	-- turn on and off modules
-	configureModules()
+	Fun.configureModules()
 
 end
 
 
 
 function functions.SaveGameSettings()
--- save game settings so they can be autoloaded next session
+	-- save game settings so they can be autoloaded next session
 	local savefile
 	local serialisedString
 	local success, message
@@ -183,9 +185,7 @@ end
 
 
 function functions.SaveGame()
--- uses the globals because too hard to pass params
-
---! for some reason bitser throws runtime error when serialising true / false values.
+	-- uses the globals because too hard to pass params
 
     local savefile
     local contents
@@ -267,9 +267,9 @@ end
 
 
 function functions.GetDistanceToClosestBase(xvalue, intBaseType)
--- returns two values: the distance to the closest base, and the object/table item for that base
--- if there are no bases (impossible) then the distance value returned will be -1
--- note: if distance is a negative value then the Lander has not yet passed the base
+	-- returns two values: the distance to the closest base, and the object/table item for that base
+	-- if there are no bases (impossible) then the distance value returned will be -1
+	-- note: if distance is a negative value then the Lander has not yet passed the base
 
 	local closestdistance = -1
 	local closestbase = {}
@@ -303,7 +303,7 @@ end
 
 
 function functions.ResetGame()
--- this resets the game for all landers - including multiplayer landers
+	-- this resets the game for all landers - including multiplayer landers
 
 	GROUND = {}
 	OBJECTS = {}	-- TODO: don't reset whole table but instead reset status, fuel amounts etc.
@@ -323,12 +323,42 @@ function functions.ResetGame()
 end
 
 function functions.getModule(moduleType)
--- Input: an enum representing the required module type.  eg: moduleRangefinder
--- OUtput: the module with that module baseType
+	-- Input: an enum representing the required module type.  eg: moduleRangefinder
+	-- OUtput: the module with that module baseType
 
 	for k,v in pairs(SHOP_MODULES) do
 		if v.id == moduleType then
 			return v
+		end
+	end
+	return nil
+end
+
+function functions.countActiveModules()
+	-- returns a single count of the number of active modules (active as in set in the OPTIONS menu)
+	local count = 0
+	for k,module in ipairs(SHOP_MODULES) do
+		if module.allowed == nil or module.allowed == true then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+function functions.getActiveModuleIndexFromSequence(indexNumber)
+	-- receive the a number and return the module index that is the x number in the list of modules
+	-- NOTE: counts only active moduleSideThrusters
+	-- eg: getActiveModuleIndexFromSequence(3) returns k where SHOP_MODULES[k] == the 3rd active module
+	-- returns a number
+
+	local i = 0
+	for k,module in ipairs(SHOP_MODULES) do
+		if module.allowed == nil or module.allowed == true then
+			i = i + 1
+			if i == indexNumber then
+				-- found the module
+				return k
+			end
 		end
 	end
 	return nil

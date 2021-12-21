@@ -52,7 +52,7 @@ _class = require 'lib.class'
 Paddy = require 'lib.paddy'
 
 -- https://gist.github.com/Vovkiv/c1b3216a07ec642c017200d571a35cc8
-aspect = require("lib.aspect")
+Aspect = require("lib.aspect")
 
 -- Common functions
 Cf = require 'lib.commonfunctions'
@@ -240,7 +240,6 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
-	Fun.LoadGameConfig()
 
 	-- Play music
 	-- true for "isLooping"
@@ -251,8 +250,8 @@ function love.load()
 
 	-- Restore full screen setting
 	-- love.window.setFullscreen(GAME_SETTINGS.FullScreen)
-	aspect.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
-	aspect.setColor(0, 0, 0, 1)
+	Aspect.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
+	Aspect.setColor(0, 0, 0, 1)
 
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
@@ -270,6 +269,7 @@ function love.load()
 	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
 	Terrain.init()
 	NewModules.createModules()
+	Fun.LoadGameConfig()	-- this has to come after createModules because it modifies modules
 
 	Fun.ResetGame()
 
@@ -289,7 +289,7 @@ function love.draw()
 	drawWallpaper()
 
 	-- TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
-	aspect.start()
+	Aspect.start()
 
 
 	strCurrentScreen = Fun.CurrentScreenName()
@@ -327,7 +327,7 @@ function love.draw()
 	LovelyToasts.draw()
 
 	-- TLfres.endRendering({0, 0, 0, 1})
-	aspect.stop()
+	Aspect.stop()
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -366,6 +366,13 @@ function love.keypressed(key, scancode, isrepeat)
 
 end
 
+function love.mousepressed( x, y, button, istouch, presses )
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
+	if strCurrentScreen == "World" then
+		HUD.mousepressed( x, y, button, istouch)
+	end
+end
+
 function love.update(dt)
 
 	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
@@ -393,5 +400,5 @@ function love.update(dt)
 	-- can potentially move this with the Slab.Update as it is only used on the main menu
 	LovelyToasts.update(dt)
 
-	aspect.update()
+	Aspect.update()
 end

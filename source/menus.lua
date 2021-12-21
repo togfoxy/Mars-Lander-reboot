@@ -344,6 +344,7 @@ function Menus.DrawSettingsMenu()
 			Slab.NewLine()
 			if Slab.Button("OK") then
 				-- return to the previous game state
+				Fun.configureModules()
 				Fun.RemoveScreen()
 			end
 		Slab.EndLayout() -- layout-settings

@@ -20,7 +20,10 @@ HUD.fuel.text.x, HUD.fuel.text.y = HUD.fuel.x + 20, HUD.fuel.y + math.floor(HUD.
 
 local ship = Assets.getImageSet("newship1")
 local flame = Assets.getImageSet("flame")
-
+local shopmenux = SCREEN_WIDTH / 2.66		-- the start/left of the shop menu. Not dynamic.
+local shopmenuy = SCREEN_HEIGHT * 0.33		-- the start/top of the shop menu. Not dynamic.
+local shopmenuwidth = SCREEN_WIDTH / 4		-- the width of the menu
+local shopmenuheight = 50					-- the height of each menu button
 
 
 -- ~~~~~~~~~~~~~~~~
@@ -52,8 +55,6 @@ local function drawFuelIndicator(lander)
     love.graphics.line(HUD.fuel.middle, y, HUD.fuel.middle, HUD.fuel.bottom)
 end
 
-
-
 local function drawOffscreenIndicator(lander)
 	-- draws an indicator when the lander flies off the top of the screen
     local lineThickness = love.graphics.getLineWidth()
@@ -72,8 +73,6 @@ local function drawOffscreenIndicator(lander)
 	-- restore line thickness
     love.graphics.setLineWidth(lineThickness)
 end
-
-
 
 local function drawMoney(lander)
 	Assets.setFont("font20")
@@ -142,8 +141,6 @@ local function drawHealthIndicator(lander)
 	love.graphics.setColor(1,1,1,1)
 end
 
-
-
 local function drawShopMenu()
 	-- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
 	local gameOver = LANDERS[1].gameOver
@@ -182,8 +179,8 @@ local function newdrawShopMenu()
 	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], Enum.basetypeFuel)
 	if not gameOver and isOnLandingPad then
 		Assets.setFont("font20")
-		local x = SCREEN_WIDTH / 2.66
-		local y = SCREEN_HEIGHT * 0.33
+		local x = shopmenux
+		local y = shopmenuy
 		for k,module in ipairs(SHOP_MODULES) do
 			if module.allowed == nil or module.allowed == true then
 				local string = "%s. Buy %s - $%s \n"
@@ -194,10 +191,10 @@ local function newdrawShopMenu()
 				end
 				love.graphics.setColor(color)
 
-				love.graphics.rectangle("line", x, y, SCREEN_WIDTH / 4, 45)
+				love.graphics.rectangle("line", x, y, shopmenuwidth, shopmenuheight - 5)
 				love.graphics.print(itemListString, x + 30, y + 12)
 
-				y = y + 50
+				y = y + shopmenuheight
 			end
 		end
 	end
@@ -212,8 +209,6 @@ local function drawGameOver()
     local y = SCREEN_HEIGHT * 0.33
     love.graphics.print(text, x, y)
 end
-
-
 
 local function drawScore()
 	-- score is simply the amount of forward distance travelled (lander.score)
@@ -239,8 +234,6 @@ local function drawScore()
 	love.graphics.print("High Score: " .. highscore, (SCREEN_WIDTH / 2) - 75, 90)
 end
 
-
-
 local function drawDebug()
 
 	if GAME_CONFIG.showDEBUG then
@@ -260,8 +253,6 @@ local function drawDebug()
 	end
 end
 
-
-
 local function drawPortInformation()
 	if IS_A_HOST then
 		love.graphics.setColor(1,1,1,0.50)
@@ -272,11 +263,25 @@ local function drawPortInformation()
 	end
 end
 
-
-
 -- ~~~~~~~~~~~~~~~~~
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
+
+function HUD.mousepressed( x, y, button, istouch)
+	-- called from MAIN.lua
+	local translatedx, translatedy = Aspect.toGame(x,y)
+	local buttonnumber = (math.ceil((translatedy - shopmenuy) / shopmenuheight))
+	local numberofactivemodules = Fun.countActiveModules()
+	local lander = LANDERS[1]
+
+	if translatedx > shopmenux and translatedx < (shopmenux + shopmenuwidth) then
+		if Lander.isOnLandingPad(lander, Enum.basetypeFuel) and buttonnumber >= 1 and buttonnumber <= numberofactivemodules then
+			-- convert the button number to a module number
+			local shopmoduleindex = Fun.getActiveModuleIndexFromSequence(buttonnumber)
+			Lander.keypressed(shopmoduleindex)
+		end
+	end
+end
 
 function HUD.drawPause()
     -- Simple text based pause screen
@@ -285,7 +290,6 @@ function HUD.drawPause()
     local text = "GAME PAUSED: PRESS <ESC> OR <P> TO RESUME"
     love.graphics.print(text, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT /2)
 end
-
 
 
 function HUD.draw()
