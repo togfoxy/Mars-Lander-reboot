@@ -11,7 +11,7 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG.useAdvancedPhysics = false
 	GAME_CONFIG.easyMode = false
 	GAME_CONFIG.music = true
-
+	GAME_CONFIG.allowGuidance = true
 end
 
 
