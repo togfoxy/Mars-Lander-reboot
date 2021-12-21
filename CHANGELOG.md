@@ -4,6 +4,12 @@ All notable changes to this project should be documented in this file.
 
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
+## unreleased
+
+### Changed
+- menu configuration to fit landscape android
+- updated credits
+
 
 ## v1.01
 
