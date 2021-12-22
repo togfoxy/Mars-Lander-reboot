@@ -28,13 +28,9 @@ local baseOff   = Assets.getImageSet("fuelbaseOff")
 function Base.init()
 end
 
-
--- TODO: Move base related functions from lander.lua
 function Base.update(dt)
     landingLights.animation:update(dt)
 end
-
-
 
 function Base.draw()
     for k,v in pairs(OBJECTS) do

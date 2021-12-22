@@ -264,6 +264,41 @@ function functions.GetDistanceToClosestBase(xvalue, intBaseType)
 	return  realdist, closestbase
 end
 
+function functions.GetDistanceToFueledBase(xvalue, intBaseType)
+	-- returns two values: the distance to the closest base with fuel, and the object/table item for that base
+	-- if there are no bases (impossible) then the distance value returned will be -1
+	-- note: if distance is a negative value then the Lander has not yet passed the base
+	local closestdistance = -1
+	local closestbase = {}
+	local absdist
+	local dist
+	local realdist
+
+	for k,v in pairs(OBJECTS) do
+		if v.objecttype == intBaseType and v.totalFuel > 2 then
+			-- the + bit is an offset to calculate the landing pad and not the image
+			absdist = math.abs(xvalue - (v.x + 85))
+			-- same but without the math.abs)
+			dist = (xvalue - (v.x + 85))
+			if closestdistance == -1 or absdist <= closestdistance then
+				closestdistance = absdist
+				closestbase = v
+			end
+		end
+	end
+
+	-- now we have the closest base, work out the distance to the landing pad for that base
+	if closestbase then
+		-- the + bit is an offset to calculate the landing pad and not the image
+print(xvalue, closestbase.x)
+		realdist = xvalue - (closestbase.x + 85)
+	end
+
+	return  realdist, closestbase
+
+
+end
+
 function functions.ResetGame()
 	-- this resets the game for all landers - including multiplayer landers
 

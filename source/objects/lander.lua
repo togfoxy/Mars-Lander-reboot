@@ -28,7 +28,7 @@ shipImage[5] = Assets.getImageSet("newship5")
 local flame = Assets.getImageSet("flame")
 local parachute = Assets.getImageSet("parachute")
 
-local landingSound = Assets.getSound("landingSuccess")
+local landingSound = Assets.getSound("landingSuccess", "static", 0.1)	-- need to put the source type if specifying the volume
 local failSound = Assets.getSound("wrong")
 local lowFuelSound = Assets.getSound("lowFuel")
 local engineSound = Assets.getSound("engine")
@@ -688,7 +688,7 @@ function Lander.draw()
 
 			love.graphics.circle("line", predictedx, predictedy, 5)
 			love.graphics.circle("line", predictedx, perfecty, 10)
-			
+
 		end
 	end
 end
