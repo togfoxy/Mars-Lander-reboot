@@ -355,6 +355,7 @@ function love.keypressed(key, scancode, isrepeat)
 
 		-- update Lander keys
 		Lander.keypressed(key, scancode, isrepeat)
+
 	elseif strCurrentScreen == "Pause" then
 		if key == "p" then
 			Fun.RemoveScreen()

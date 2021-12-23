@@ -1,5 +1,7 @@
 local AI = {}
 
+-- high score = 23,650
+
 local currentAltitude
 local currentIsOnBase
 predictedx = 0   -- this is the lookahead ability
@@ -14,15 +16,18 @@ local tooright
 local tooslow
 local toofast
 local closestbase       -- object
+local lookahead = 240		-- how far to look ahead
 
 local function GetCurrentState(lander)
     currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
     currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
 
-    local lookahead = 120		-- how far to look ahead
     predictedx = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
     predictedy = lander.y + (lander.vy * lookahead)
     predictedYgroundValue = GROUND[Cf.round(predictedx + WORLD_OFFSET,0)]
+
+print(predictedx, Cf.round(predictedx + WORLD_OFFSET ))
+    assert(predictedYgroundValue ~= nil)
 
     -- negative value means not yet past the base
     currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
@@ -31,11 +36,18 @@ local function GetCurrentState(lander)
     while closestbase.x == nil do
         Terrain.generate(SCREEN_WIDTH * 2)
         currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
+print("Adding more terrain")
+    end
+
+    -- ensure this is after the terrain.generate
+    -- look far ahead for long distances
+    if math.abs(currentDistanceToBase) > 2000 then
+        lookahead = 240
+    else
+        lookahead = 120
     end
 
     perfecty = predictedYgroundValue - math.abs(currentDistanceToBase)
-
--- print(predictedYgroundValue, currentDistanceToBase, perfecty)
 
     perfectvx = currentDistanceToBase / -120        -- some constant that determines best vx
 
@@ -108,8 +120,14 @@ local function DetermineAction(lander, dt)
                 Lander.doThrust(lander, dt)
             end
         end
-    else
+        if toohigh and tooslow then
+            turnTowardsAngle(lander, 359, dt)
+        end
+        if lander.angle > 345 then
+            Lander.doThrust(lander, dt)
+        end
 
+    else
     end
 end
 
