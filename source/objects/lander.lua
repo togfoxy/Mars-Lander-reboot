@@ -516,7 +516,7 @@ function Lander.isOnLandingPad(lander, baseId)
 	-- returns a true / false value
 
     local baseDistance, _ = Fun.GetDistanceToClosestBase(lander.x, baseId)
-    if baseDistance >= -80 and baseDistance <= 40 then
+    if baseDistance >= -80 and baseDistance <= 40 and altitude(lander) < 22 then
         return true
     else
         return false
