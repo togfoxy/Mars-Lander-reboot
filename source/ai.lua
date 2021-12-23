@@ -28,7 +28,6 @@ local function GetCurrentState(lander)
     currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
 
     -- searching for a base can outstrip the terrain so guard against that.
-print(WORLD_OFFSET + SCREEN_WIDTH, #GROUND)
     while closestbase.x == nil do
         Terrain.generate(SCREEN_WIDTH * 2)
         currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
@@ -72,26 +71,39 @@ print(WORLD_OFFSET + SCREEN_WIDTH, #GROUND)
 
 end
 
+local function turnTowardsAngle(lander, angle, dt)
+    -- given an angle, turn left or right to meet it
+    if lander.angle < angle then
+        -- turn right/clockwise
+        lander.angle = lander.angle + (90 * dt)
+        if lander.angle > angle then lander.angle = angle end
+
+    elseif lander.angle > angle then
+        -- turn left/anti-clockwise
+        lander.angle = lander.angle - (90 * dt)
+        if lander.angle < angle then lander.angle = angle end
+    else
+        -- on target. Do nothing
+    end
+
+end
+
 local function DetermineAction(lander, dt)
 
     if not currentIsOnBase or (math.abs(currentDistanceToBase) > 200) or (lander.fuel >= lander.fuelCapacity) then
         if toolow and tooslow then
-            -- turn right
-            lander.angle = lander.angle + (90 * dt)
-            if lander.angle > 315 then lander.angle = 315 end
+            -- turn to 315
+            turnTowardsAngle(lander, 315, dt)
             Lander.doThrust(lander, dt)
         end
         if toolow and toofast then
-            -- turn left
-            lander.angle = lander.angle - (90 * dt)
-            if lander.angle < 235 then lander.angle = 235 end
+            -- turn to 235
+            turnTowardsAngle(lander, 235, dt)
             Lander.doThrust(lander, dt)
         end
         if toohigh and toofast then
             -- turn left
-            lander.angle = lander.angle - (90 * dt)
-            if lander.angle < 180 then lander.angle = 180 end
-
+            turnTowardsAngle(lander, 180, dt)
             if lander.angle < 215 then
                 Lander.doThrust(lander, dt)
             end
