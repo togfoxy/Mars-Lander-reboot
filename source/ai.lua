@@ -27,6 +27,13 @@ local function GetCurrentState(lander)
     -- negative value means not yet past the base
     currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
 
+    -- searching for a base can outstrip the terrain so guard against that.
+print(WORLD_OFFSET + SCREEN_WIDTH, #GROUND)
+    while closestbase.x == nil do
+        Terrain.generate(SCREEN_WIDTH * 2)
+        currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
+    end
+
     perfecty = predictedYgroundValue - math.abs(currentDistanceToBase)
 
 -- print(predictedYgroundValue, currentDistanceToBase, perfecty)
@@ -36,11 +43,11 @@ local function GetCurrentState(lander)
     if predictedy < perfecty then
         toohigh = true
         toolow = false
-print("too high")
+--print("too high")
     else
         toohigh = false
         toolow = true
-print("too low")
+--print("too low")
     end
 
     if currentDistanceToBase < 0 then
@@ -54,20 +61,19 @@ print("too low")
     if lander.vx < perfectvx then
         tooslow = true
         toofast = false
-print("too slow")
+--print("too slow")
     else
         tooslow = false
         toofast = true
-print("too fast")
+--print("too fast")
     end
 
-print("~~~")
+--print("~~~")
 
 end
 
 local function DetermineAction(lander, dt)
 
--- print(closestbase.totalFuel)
     if not currentIsOnBase or (math.abs(currentDistanceToBase) > 200) or (lander.fuel >= lander.fuelCapacity) then
         if toolow and tooslow then
             -- turn right

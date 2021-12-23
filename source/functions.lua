@@ -288,9 +288,8 @@ function functions.GetDistanceToFueledBase(xvalue, intBaseType)
 	end
 
 	-- now we have the closest base, work out the distance to the landing pad for that base
-	if closestbase then
+	if closestbase.x ~= nil then
 		-- the + bit is an offset to calculate the landing pad and not the image
-print(xvalue, closestbase.x)
 		realdist = xvalue - (closestbase.x + 85)
 	end
 
