@@ -14,8 +14,6 @@ local bubbleText = {}	-- Text that appears like a bubble
 -- Local Variables
 -- ~~~~~~~~~~~~~~~~
 
-local keyDown = love.keyboard.isDown
-
 -- TODO: Create the spriteData with width and height automatically (except for animations)
 -- local ship = Assets.getImageSet("newship")
 local shipImage = {}
@@ -574,6 +572,8 @@ end
 
 
 function Lander.update(lander, dt)
+	local keyDown = love.keyboard.isDown
+
     if keyDown("up") or keyDown("w") or keyDown("kp8") then
         Lander.doThrust(lander, dt)
     end

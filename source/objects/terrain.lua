@@ -46,7 +46,7 @@ local function addBuildings(groundTableSize)
 			-- the next building is between one screenwidth and 1.66 away from the last building
 			local nextBuildingDistance = SCREEN_WIDTH + love.math.random((SCREEN_WIDTH * 0.66),SCREEN_WIDTH)
 			nextBuildingX = OBJECTS[lastBuildingIndex].x + nextBuildingDistance
-		end	
+		end
 		nextBuildingX = Cf.round(nextBuildingX,0)
 		if nextBuildingX <= groundTableSize then
 			local newBaseType = love.math.random(7,8)		-- hack
@@ -134,7 +134,7 @@ function Terrain.generate(intAmountToCreate)
 
 	-- add some buildings before adding fuel
 	if LANDERS[1] == nil then
-	
+
 	else
 		addBuildings(LANDERS[1].x + 6000)	-- an arbitrary 'draw ahead' distance
 		-- add fuel bases after the buildings so they can draw layered if need be
@@ -146,10 +146,12 @@ function Terrain.generate(intAmountToCreate)
 end
 
 
--- TODO: Draw all lines to a canvas once in a while to save drawcalls
--- draws the terrain as a bunch of lines that are 1 pixel in length
+
 function Terrain.draw()
+	-- draws the terrain as a bunch of lines that are 1 pixel in length
 	-- ensure we have enough terrain
+
+--print(WORLD_OFFSET + SCREEN_WIDTH, #GROUND)
 	if (WORLD_OFFSET + SCREEN_WIDTH) > #GROUND then
 		Terrain.generate(SCREEN_WIDTH * 2)
 	end
