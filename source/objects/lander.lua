@@ -87,7 +87,6 @@ local function deployParachute(lander)
 	end
 end
 
-
 local function thrustLeft(lander, dt)
 	-- TODO: consider the side thrusters moving left/right based on angle and not just movement on the X axis.
 	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleSideThrusters)) and landerHasFuelToThrust(lander, dt) then
@@ -429,11 +428,11 @@ function Lander.create(name)
 	lander.gameOver = false
 	lander.score = lander.x - ORIGIN_X
 	lander.name = name or CURRENT_PLAYER_NAME
+	lander.isBot = false
 
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
 	end
-
 
 	-- mass
 	lander.mass = {}
@@ -571,38 +570,44 @@ function Lander.doThrust(lander, dt)
 end
 
 
-function Lander.update(lander, dt)
-	local keyDown = love.keyboard.isDown
+function Lander.update(dt)
 
-    if keyDown("up") or keyDown("w") or keyDown("kp8") then
-        Lander.doThrust(lander, dt)
-    end
-	-- rotate the lander anti-clockwise
-    if keyDown("left") or keyDown("a") or keyDown("kp4") then
-		lander.angle = lander.angle - (90 * dt)
-    end
-	-- rotate the lander clockwise
-    if keyDown("right") or keyDown("d") or keyDown("kp6") then
-		lander.angle = lander.angle + (90 * dt)
-    end
-    if keyDown("q") or keyDown("kp7") then
-        thrustLeft(lander, dt)
-    end
-    if keyDown("e") or keyDown("kp9") then
-        thrustRight(lander, dt)
-    end
+	for k, lander in pairs(LANDERS) do
 
-	-- TODO: Calculate the offset so that it doesn't need to be global
-	-- Calculate worldOffset for everyone based on lander x position
-	WORLD_OFFSET = Cf.round(lander.x) - ORIGIN_X
-	-- Reset angle if > 360 degree
-	if math.max(lander.angle) > 360 then lander.angle = 0 end
-	-- Update ship
-    moveShip(lander, dt)
-    playSoundEffects(lander)
-    checkForContact(lander, dt)
-	updateScore(lander)
-	updateBubbleText(dt)
+		local keyDown = love.keyboard.isDown
+
+	    if keyDown("up") or keyDown("w") or keyDown("kp8") then
+	        Lander.doThrust(lander, dt)
+	    end
+		-- rotate the lander anti-clockwise
+	    if keyDown("left") or keyDown("a") or keyDown("kp4") then
+			lander.angle = lander.angle - (90 * dt)
+	    end
+		-- rotate the lander clockwise
+	    if keyDown("right") or keyDown("d") or keyDown("kp6") then
+			lander.angle = lander.angle + (90 * dt)
+	    end
+	    if keyDown("q") or keyDown("kp7") then
+	        thrustLeft(lander, dt)
+	    end
+	    if keyDown("e") or keyDown("kp9") then
+	        thrustRight(lander, dt)
+	    end
+
+		-- TODO: Calculate the offset so that it doesn't need to be global
+		-- Calculate worldOffset for everyone based on lander x position
+		WORLD_OFFSET = Cf.round(LANDERS[1].x) - ORIGIN_X
+
+		-- Reset angle if > 360 degree
+		if math.max(lander.angle) > 360 then lander.angle = 0 end
+
+		-- Update ship
+	    moveShip(lander, dt)
+	    playSoundEffects(lander)
+	    checkForContact(lander, dt)
+		updateScore(lander)
+		updateBubbleText(dt)
+	end
 end
 
 function Lander.draw()
@@ -688,7 +693,6 @@ function Lander.draw()
 
 			love.graphics.circle("line", predictedx, predictedy, 5)
 			love.graphics.circle("line", predictedx, perfecty, 10)
-
 		end
 	end
 end

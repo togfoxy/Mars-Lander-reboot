@@ -7,16 +7,14 @@
 
 local Terrain = {}
 
-
-
 -- ~~~~~~~~~~~~~~~~
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
 local function getLastBaseID(baseType)
--- scans the OBJECTS array and returns the index (id) of the last object in the array of type baseType
--- returns 0 if no base of that type found
--- accepts basetypeBuilding meaning any building
+	-- scans the OBJECTS array and returns the index (id) of the last object in the array of type baseType
+	-- returns 0 if no base of that type found
+	-- accepts basetypeBuilding meaning any building
 
 	local lastBaseID = 0
 	for i = 1, #OBJECTS do
@@ -30,9 +28,8 @@ local function getLastBaseID(baseType)
 	return lastBaseID
 end
 
-
 local function addBuildings(groundTableSize)
--- add some buildings
+	-- add some buildings
 	repeat
 		local lastBuildingIndex
 		local nextBuildingX
@@ -79,14 +76,13 @@ local function addFuelBases(groundTableSize)
 	until not true	-- infinite loop using a break statement
 end
 
-
 -- ~~~~~~~~~~~~~~~~~
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
 
 function Terrain.init()
--- initialise the ground array to be a flat line
--- add bases to OBJECTS
+	-- initialise the ground array to be a flat line
+	-- add bases to OBJECTS
 
 	-- this creates a big flat space at the start of the game
 	for i = 0, (SCREEN_WIDTH * 0.90) do
@@ -99,10 +95,8 @@ function Terrain.init()
 	addBuildings(#GROUND)
 end
 
-
-
 function Terrain.generate(intAmountToCreate)
--- gets a predictable terrain value (deterministic) base on x
+	-- gets a predictable terrain value (deterministic) base on x
 
 	-- create terrain
 
@@ -145,8 +139,6 @@ function Terrain.generate(intAmountToCreate)
 
 end
 
-
-
 function Terrain.draw()
 	-- draws the terrain as a bunch of lines that are 1 pixel in length
 	-- ensure we have enough terrain
@@ -167,6 +159,5 @@ function Terrain.draw()
 		end
 	end
 end
-
 
 return Terrain
