@@ -8,12 +8,14 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ### Added
 - a new 'guidance unit' upgrade
+- added a bot to fly against. Set in options menu
 
 ### Changed
+- adjusted the volume on audio files
+- moved the default_mass variable from global to inside each lander
 
 ### Fixed
-
-
+- fixed a bug with saving the high score
 
 ## v1.01
 
