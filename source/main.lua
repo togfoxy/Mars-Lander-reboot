@@ -76,8 +76,6 @@ Assets.newFont(16)
 Assets.newFont(18)
 Assets.newFont(20)
 
-
-
 -- ~~~~~~~~~~~~~~~~~~
 -- Modules / Classes
 -- ~~~~~~~~~~~~~~~~~~
@@ -100,8 +98,6 @@ Fun			= require 'functions'
 Menus		= require 'menus'
 EnetHandler = require 'enetstuff'
 AI 			= require 'ai'
-
-
 
 -- ~~~~~~~~~~~~~~~~~
 -- Global variables
@@ -133,8 +129,6 @@ IS_A_CLIENT = false		-- defaults to NOT a client until the player chooses to con
 IS_A_HOST = false			-- Will listen on load but is not a host until someone connects
 ENET_IS_CONNECTED = false	-- Will become true when received an acknowledgement from the server
 HOST_IP_ADDRESS = ""
-
-
 
 -- ~~~~~~~~~~~~~~~~
 -- Local variables
@@ -354,9 +348,10 @@ function love.keypressed(key, scancode, isrepeat)
 			Fun.RemoveScreen()
 		end
 	elseif strCurrentScreen == "Settings" then
-		if key == "o" then
-			Fun.RemoveScreen()
-		end
+		--! typing an 'o' in the player name will close the screen so disabling this code for now
+		--if key == "o" then
+			--Fun.RemoveScreen()
+		--end
 	end
 
 end

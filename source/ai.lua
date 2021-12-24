@@ -27,8 +27,8 @@ local function GetCurrentState(lander)
     predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
 
     if predictedYgroundValue == nil then
-        print(predictedx,predictedy,predictedYgroundValue)
-        error("oops")
+        print(#GROUND, predictedx,predictedy,predictedYgroundValue)
+        error("oops - check the console for debug info")
     end
 
     -- negative value means not yet past the base
@@ -36,7 +36,7 @@ local function GetCurrentState(lander)
 
     -- searching for a base can outstrip the terrain so guard against that.
     while closestbase.x == nil do
-        Terrain.generate(SCREEN_WIDTH * 2)
+        Terrain.generate(SCREEN_WIDTH * 4)
         currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx, Enum.basetypeFuel)
 print("Adding more terrain")
     end
@@ -49,7 +49,9 @@ print("Adding more terrain")
         lookahead = 120
     end
 
+    -- the perfecty value is a 45 degree angle from the base to the sky
     perfecty = predictedYgroundValue - math.abs(currentDistanceToBase)
+    if perfecty < SCREEN_HEIGHT / 3 then perfecty = SCREEN_HEIGHT / 3 end
 
     perfectvx = currentDistanceToBase / -120        -- some constant that determines best vx
 
@@ -104,7 +106,17 @@ end
 
 local function DetermineAction(lander, dt)
 
-    if not currentIsOnBase or (math.abs(currentDistanceToBase) > 200) or (lander.fuel >= lander.fuelCapacity) then
+    local takeaction = false
+    local abscurrentDistanceToBase = (math.abs(currentDistanceToBase))
+
+    -- if not on base
+    if not currentIsOnBase then takeaction = true end
+    -- if tank is full
+    if lander.fuel >= lander.fuelCapacity then takeaction = true end
+    -- if not near a base
+    if abscurrentDistanceToBase > 200 then takeaction = true end
+
+    if takeaction then
         if toolow and tooslow then
             -- turn to 315
             turnTowardsAngle(lander, 315, dt)
@@ -125,8 +137,9 @@ local function DetermineAction(lander, dt)
                 Lander.doThrust(lander, dt)
             end
         else
-print("undedetected scenario")
+            print("undedetected scenario")
         end
+
     else
         -- is on base or close to base or refuelling
         -- do nothing

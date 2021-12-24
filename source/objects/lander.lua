@@ -296,16 +296,19 @@ local function checkForContact(lander, dt)
 end
 
 local function playSoundEffects(lander)
-	if lander.engineOn then
-		engineSound:play()
-	else
-		engineSound:stop()
-	end
 
-	local fuelPercent = lander.fuel / lander.fuelCapacity
-	-- play alert if fuel is low (but not empty because that's just annoying)
-	if fuelPercent <= 0.33 and fuelPercent > 0.01 then
-		lowFuelSound:play()
+	if not lander.isBot then
+		if lander.engineOn then
+			engineSound:play()
+		else
+			engineSound:stop()
+		end
+
+		local fuelPercent = lander.fuel / lander.fuelCapacity
+		-- play alert if fuel is low (but not empty because that's just annoying)
+		if fuelPercent <= 0.33 and fuelPercent > 0.01 then
+			lowFuelSound:play()
+		end
 	end
 end
 
@@ -576,26 +579,30 @@ function Lander.update(dt)
 
 	for k, lander in pairs(LANDERS) do
 
-		local keyDown = love.keyboard.isDown
+		-- need to ensure the player actions don't override bots and other players
+		--! probably don't want a FOR loop here
+		if k == 1 then
+			local keyDown = love.keyboard.isDown
 
-	    if keyDown("up") or keyDown("w") or keyDown("kp8") then
-			-- bot has it's own thrust routines
-			if not lander.isBot then Lander.doThrust(lander, dt) end
-	    end
-		-- rotate the lander anti-clockwise
-	    if keyDown("left") or keyDown("a") or keyDown("kp4") then
-			lander.angle = lander.angle - (90 * dt)
-	    end
-		-- rotate the lander clockwise
-	    if keyDown("right") or keyDown("d") or keyDown("kp6") then
-			lander.angle = lander.angle + (90 * dt)
-	    end
-	    if keyDown("q") or keyDown("kp7") then
-	        thrustLeft(lander, dt)
-	    end
-	    if keyDown("e") or keyDown("kp9") then
-	        thrustRight(lander, dt)
-	    end
+		    if keyDown("up") or keyDown("w") or keyDown("kp8") then
+				-- bot has it's own thrust routines
+				if not lander.isBot then Lander.doThrust(lander, dt) end
+		    end
+			-- rotate the lander anti-clockwise
+		    if keyDown("left") or keyDown("a") or keyDown("kp4") then
+				lander.angle = lander.angle - (90 * dt)
+		    end
+			-- rotate the lander clockwise
+		    if keyDown("right") or keyDown("d") or keyDown("kp6") then
+				lander.angle = lander.angle + (90 * dt)
+		    end
+		    if keyDown("q") or keyDown("kp7") then
+		        thrustLeft(lander, dt)
+		    end
+		    if keyDown("e") or keyDown("kp9") then
+		        thrustRight(lander, dt)
+		    end
+		end
 
 		-- TODO: Calculate the offset so that it doesn't need to be global
 		-- Calculate worldOffset for everyone based on lander x position

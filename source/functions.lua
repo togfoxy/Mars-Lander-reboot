@@ -375,7 +375,6 @@ function functions.processBots()
 			if lander.isBot then botexists = true end
 		end
 		if botexists then
-print("charlie")
 			-- bot is on and bot exists. Do nothing.
 		else
 			local newLander = Lander.create()
@@ -384,12 +383,9 @@ print("charlie")
 			table.insert(LANDERS, newLander)
 		end
 	else
-print("echo")
 		-- ensure all bots are destroyed
 		for k,lander in pairs(LANDERS) do
-print("foxtrot")
 			if lander.isBot then
-print("golf")
 				table.remove(LANDERS, k)
 			end
 		end

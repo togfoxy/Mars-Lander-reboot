@@ -96,7 +96,9 @@ function Terrain.init()
 end
 
 function Terrain.generate(intAmountToCreate)
-	-- gets a predictable terrain value (deterministic) base on x
+	-- starting from the end of the current terrain table, create intAmountToCreate terrain
+	-- adds bases and buildings
+
 
 	-- create terrain
 
@@ -133,6 +135,7 @@ function Terrain.generate(intAmountToCreate)
 		addBuildings(LANDERS[1].x + 6000)	-- an arbitrary 'draw ahead' distance
 		-- add fuel bases after the buildings so they can draw layered if need be
 		addFuelBases(LANDERS[1].x + 6000)	-- an arbitrary 'draw ahead' distance
+		addFuelBases(#GROUND)	-- an arbitrary 'draw ahead' distance
 	end
 
 	-- TODO: find a way to remove terrain that is behind the lander and likely never needed
