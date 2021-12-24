@@ -99,6 +99,7 @@ Cobjs		= require 'createobjects'
 Fun			= require 'functions'
 Menus		= require 'menus'
 EnetHandler = require 'enetstuff'
+AI 			= require 'ai'
 
 
 
@@ -112,16 +113,12 @@ LANDERS = {}
 GROUND = {}			-- stores the y value for the ground
 OBJECTS = {}		-- stores objects that need to be drawn
 SHOP_MODULES = {}
-MASS_RATIO = 0		-- for debugging only. Records current mass/default mass ratio
 GAME_SETTINGS = {}	-- track game settings
 GAME_CONFIG = {}	-- tracks the user defined settings for modules turned on and off
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
 ORIGIN_X = Cf.round(SCREEN_WIDTH / 2, 0)
 WORLD_OFFSET = ORIGIN_X
-
--- this is the mass the lander starts with hence the mass the noob engines are tuned to
-DEFAULT_MASS = 220
 
 -- track speed of the lander to detect crashes etc
 LANDER_VX = 0
@@ -241,6 +238,7 @@ function love.load()
 	-- Load settings
 	Fun.LoadGameSettings()
 
+
 	-- Play music
 	-- true for "isLooping"
 	if GAME_CONFIG.music then
@@ -256,14 +254,12 @@ function love.load()
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
 
-
     -- Need to make canvas in or after love.load
     if PADDY then
         local self = PADDY
 
         self.dpad.canvas = love.graphics.newCanvas(self.dpad.w,self.dpad.h)
         self.buttons.canvas = love.graphics.newCanvas(self.buttons.w,self.buttons.h)
-
     end
 
 	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
@@ -274,7 +270,7 @@ function love.load()
 	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
-	DEFAULT_MASS = Lander.getMass(LANDERS[1])
+	LANDERS[1].currentMass = Lander.getMass(LANDERS[1])
 
 	LovelyToasts.options.queueEnabled = true
 
@@ -290,7 +286,6 @@ function love.draw()
 
 	-- TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
 	Aspect.start()
-
 
 	strCurrentScreen = Fun.CurrentScreenName()
 
@@ -326,7 +321,6 @@ function love.draw()
 	--* Put this AFTER the slab so that it draws over the slab
 	LovelyToasts.draw()
 
-	-- TLfres.endRendering({0, 0, 0, 1})
 	Aspect.stop()
 end
 
@@ -354,6 +348,7 @@ function love.keypressed(key, scancode, isrepeat)
 
 		-- update Lander keys
 		Lander.keypressed(key, scancode, isrepeat)
+
 	elseif strCurrentScreen == "Pause" then
 		if key == "p" then
 			Fun.RemoveScreen()
@@ -388,7 +383,7 @@ function love.update(dt)
 	        PADDY:update(dt)
 	    end
 		if strCurrentScreen == "World" then
-			Lander.update(LANDERS[1], dt)
+			Lander.update(dt)
 			Smoke.update(dt)
 			Base.update(dt)
 			Building.update(dt)
@@ -396,9 +391,7 @@ function love.update(dt)
 	end
 
 	EnetHandler.update(dt)
-
-	-- can potentially move this with the Slab.Update as it is only used on the main menu
 	LovelyToasts.update(dt)
-
+	AI.update(dt)
 	Aspect.update()
 end

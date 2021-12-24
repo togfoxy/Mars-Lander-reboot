@@ -7,16 +7,14 @@
 
 local Terrain = {}
 
-
-
 -- ~~~~~~~~~~~~~~~~
 -- Local functions
 -- ~~~~~~~~~~~~~~~~
 
 local function getLastBaseID(baseType)
--- scans the OBJECTS array and returns the index (id) of the last object in the array of type baseType
--- returns 0 if no base of that type found
--- accepts basetypeBuilding meaning any building
+	-- scans the OBJECTS array and returns the index (id) of the last object in the array of type baseType
+	-- returns 0 if no base of that type found
+	-- accepts basetypeBuilding meaning any building
 
 	local lastBaseID = 0
 	for i = 1, #OBJECTS do
@@ -30,9 +28,8 @@ local function getLastBaseID(baseType)
 	return lastBaseID
 end
 
-
 local function addBuildings(groundTableSize)
--- add some buildings
+	-- add some buildings
 	repeat
 		local lastBuildingIndex
 		local nextBuildingX
@@ -46,7 +43,7 @@ local function addBuildings(groundTableSize)
 			-- the next building is between one screenwidth and 1.66 away from the last building
 			local nextBuildingDistance = SCREEN_WIDTH + love.math.random((SCREEN_WIDTH * 0.66),SCREEN_WIDTH)
 			nextBuildingX = OBJECTS[lastBuildingIndex].x + nextBuildingDistance
-		end	
+		end
 		nextBuildingX = Cf.round(nextBuildingX,0)
 		if nextBuildingX <= groundTableSize then
 			local newBaseType = love.math.random(7,8)		-- hack
@@ -79,14 +76,13 @@ local function addFuelBases(groundTableSize)
 	until not true	-- infinite loop using a break statement
 end
 
-
 -- ~~~~~~~~~~~~~~~~~
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~
 
 function Terrain.init()
--- initialise the ground array to be a flat line
--- add bases to OBJECTS
+	-- initialise the ground array to be a flat line
+	-- add bases to OBJECTS
 
 	-- this creates a big flat space at the start of the game
 	for i = 0, (SCREEN_WIDTH * 0.90) do
@@ -99,10 +95,8 @@ function Terrain.init()
 	addBuildings(#GROUND)
 end
 
-
-
 function Terrain.generate(intAmountToCreate)
--- gets a predictable terrain value (deterministic) base on x
+	-- gets a predictable terrain value (deterministic) base on x
 
 	-- create terrain
 
@@ -134,7 +128,7 @@ function Terrain.generate(intAmountToCreate)
 
 	-- add some buildings before adding fuel
 	if LANDERS[1] == nil then
-	
+
 	else
 		addBuildings(LANDERS[1].x + 6000)	-- an arbitrary 'draw ahead' distance
 		-- add fuel bases after the buildings so they can draw layered if need be
@@ -145,11 +139,11 @@ function Terrain.generate(intAmountToCreate)
 
 end
 
-
--- TODO: Draw all lines to a canvas once in a while to save drawcalls
--- draws the terrain as a bunch of lines that are 1 pixel in length
 function Terrain.draw()
+	-- draws the terrain as a bunch of lines that are 1 pixel in length
 	-- ensure we have enough terrain
+
+--print(WORLD_OFFSET + SCREEN_WIDTH, #GROUND)
 	if (WORLD_OFFSET + SCREEN_WIDTH) > #GROUND then
 		Terrain.generate(SCREEN_WIDTH * 2)
 	end
@@ -165,6 +159,5 @@ function Terrain.draw()
 		end
 	end
 end
-
 
 return Terrain
