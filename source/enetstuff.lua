@@ -11,8 +11,6 @@ local timerHostSendTimer = TIMER_HOST_SEND_INTERVAL
 local timerClientSendInterval = 0.04
 local timerClientSendTimer = timerClientSendInterval
 
-
-
 function EnetHandler.disconnectHost()
 	ENET_IS_CONNECTED = false
 	IS_A_HOST = false
@@ -21,10 +19,8 @@ function EnetHandler.disconnectHost()
 	server:destroy()
 end
 
-
-
 function EnetHandler.disconnectClient(clientConnectionID)
--- client is disconnecting. Send msg to host
+	-- client is disconnecting. Send msg to host
 	ENET_IS_CONNECTED = false
 	IS_A_CLIENT = false
 
@@ -32,12 +28,9 @@ function EnetHandler.disconnectClient(clientConnectionID)
 	client:update()
 end
 
-
-
 function EnetHandler.createHost()
--- called by menu
+	-- called by menu
 
-	--server = Sock.newServer("*", 22122)
 	server = Sock.newServer("*", 22122)
 	ENET_IS_CONNECTED = true
 

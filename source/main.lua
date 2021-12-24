@@ -242,6 +242,7 @@ function love.load()
 	-- Load settings
 	Fun.LoadGameSettings()
 
+
 	-- Play music
 	-- true for "isLooping"
 	if GAME_CONFIG.music then
@@ -257,14 +258,12 @@ function love.load()
 	-- First screen / entry point
 	Fun.AddScreen("MainMenu")
 
-
     -- Need to make canvas in or after love.load
     if PADDY then
         local self = PADDY
 
         self.dpad.canvas = love.graphics.newCanvas(self.dpad.w,self.dpad.h)
         self.buttons.canvas = love.graphics.newCanvas(self.buttons.w,self.buttons.h)
-
     end
 
 	-- ensure Terrain.init appears before Lander.create (which is inside Fun.ResetGame)
@@ -291,7 +290,6 @@ function love.draw()
 
 	-- TLfres.beginRendering(SCREEN_WIDTH,SCREEN_HEIGHT)
 	Aspect.start()
-
 
 	strCurrentScreen = Fun.CurrentScreenName()
 
@@ -327,7 +325,6 @@ function love.draw()
 	--* Put this AFTER the slab so that it draws over the slab
 	LovelyToasts.draw()
 
-	-- TLfres.endRendering({0, 0, 0, 1})
 	Aspect.stop()
 end
 
@@ -390,7 +387,7 @@ function love.update(dt)
 	        PADDY:update(dt)
 	    end
 		if strCurrentScreen == "World" then
-			Lander.update(LANDERS[1], dt)
+			Lander.update(dt)
 			Smoke.update(dt)
 			Base.update(dt)
 			Building.update(dt)
@@ -398,10 +395,7 @@ function love.update(dt)
 	end
 
 	EnetHandler.update(dt)
-
-	-- can potentially move this with the Slab.Update as it is only used on the main menu
 	LovelyToasts.update(dt)
-	AI.update(LANDERS[1], dt)
-
+	AI.update(dt)
 	Aspect.update()
 end

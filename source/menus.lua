@@ -330,6 +330,11 @@ function Menus.DrawSettingsMenu()
 		if Slab.CheckBox(GAME_CONFIG.allowGuidance, "Allow guidance") then
 			GAME_CONFIG.allowGuidance = not GAME_CONFIG.allowGuidance
 		end
+
+		if Slab.CheckBox(GAME_CONFIG.botOn, "Fly with a bot") then
+	        GAME_CONFIG.botOn = not GAME_CONFIG.botOn
+	    end
+
 		Slab.EndLayout() -- layout-settings
 
 		-- this displays the OK button at the bottom
@@ -341,13 +346,13 @@ function Menus.DrawSettingsMenu()
 			Slab.NewLine()
 			Slab.NewLine()
 			Slab.NewLine()
-			Slab.NewLine()
-			Slab.NewLine()
 
 			Slab.Separator()
 			Slab.NewLine()
 			if Slab.Button("OK") then
 				-- return to the previous game state
+
+				Fun.processBots()	-- add/remove a bot depending on botOn value
 				Fun.configureModules()
 				Fun.RemoveScreen()
 			end

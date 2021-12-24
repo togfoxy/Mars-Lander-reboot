@@ -10,6 +10,7 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG.easyMode = false
 	GAME_CONFIG.music = true
 	GAME_CONFIG.allowGuidance = true
+	GAME_CONFIG.botOn = true
 end
 
 function functions.configureModules()
@@ -110,6 +111,8 @@ function functions.SaveGameSettings()
 	local success, message
 	local savedir = love.filesystem.getSource()
 
+-- print(Inspect(GAME_SETTINGS))
+
     savefile = savedir .. "/savedata/" .. "settings.dat"
     serialisedString = Bitser.dumps(GAME_SETTINGS)
     success, message = Nativefs.write(savefile, serialisedString )
@@ -122,7 +125,7 @@ function functions.LoadGameSettings()
 
     local savefile, contents
 
-    savefile = savedir .. "/savedata" .. "settings.dat"
+    savefile = savedir .. "/savedata/" .. "settings.dat"
     contents, _ = Nativefs.read(savefile)
 	local success
     success, GAME_SETTINGS = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
@@ -131,11 +134,8 @@ function functions.LoadGameSettings()
 		GAME_SETTINGS = {}
 	end
 
-	--[[ FIXME:
-	-- This is horrible bugfix and needs refactoring. If a player doesn't have
-	-- a settings.dat already then all the values in GAME_SETTINGS table are
+	--If a player doesn't have 	-- a settings.dat already then all the values in GAME_SETTINGS table are
 	-- nil. This sets some reasonable defaults to stop nil value crashes.
-	]]--
 	if GAME_SETTINGS.PlayerName == nil then
 		GAME_SETTINGS.PlayerName = DEFAULT_PLAYER_NAME
 	end
@@ -294,8 +294,6 @@ function functions.GetDistanceToFueledBase(xvalue, intBaseType)
 	end
 
 	return  realdist, closestbase
-
-
 end
 
 function functions.ResetGame()
@@ -315,6 +313,8 @@ function functions.ResetGame()
 		LANDERS = {}
 		table.insert(LANDERS, Lander.create())
 	end
+
+	Fun.processBots()
 
 end
 
@@ -365,6 +365,35 @@ function functions.getAltitude(lander)
 	local landerYValue = lander.y
 	local groundYValue = GROUND[Cf.round(lander.x,0)]
 	return groundYValue - landerYValue
+end
+
+function functions.processBots()
+	-- makes sure bots are on or off according to global setting
+	if GAME_CONFIG.botOn then
+		-- check if bot already exists
+		local botexists = false
+		for k,lander in pairs(LANDERS) do
+			if lander.isBot then botexists = true end
+		end
+		if botexists then
+print("charlie")
+			-- bot is on and bot exists. Do nothing.
+		else
+			local newLander = Lander.create()
+			newLander.isBot = true
+			table.insert(LANDERS, newLander)
+		end
+	else
+print("echo")
+		-- ensure all bots are destroyed
+		for k,lander in pairs(LANDERS) do
+print("foxtrot")
+			if lander.isBot then
+print("golf")
+				table.remove(LANDERS, k)
+			end
+		end
+	end
 end
 
 return functions

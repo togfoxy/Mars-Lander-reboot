@@ -26,7 +26,7 @@ local function GetCurrentState(lander)
     predictedy = lander.y + (lander.vy * lookahead)
     predictedYgroundValue = GROUND[Cf.round(predictedx + WORLD_OFFSET,0)]
 
-print(predictedx, Cf.round(predictedx + WORLD_OFFSET ))
+-- print(predictedx, Cf.round(predictedx + WORLD_OFFSET ))
     assert(predictedYgroundValue ~= nil)
 
     -- negative value means not yet past the base
@@ -131,19 +131,16 @@ local function DetermineAction(lander, dt)
     end
 end
 
-local function SetAction()
-
-end
-
-function AI.update(lander, dt)
+function AI.update(dt)
 
     if Fun.CurrentScreenName() == "World" then
-        GetCurrentState(lander)
-        DetermineAction(lander, dt)
-        SetAction()
+        for k, lander in pairs(LANDERS) do
+            if lander.isBot then
+                GetCurrentState(lander)
+                DetermineAction(lander, dt)
+            end
+        end
     end
 end
-
-
 
 return AI
