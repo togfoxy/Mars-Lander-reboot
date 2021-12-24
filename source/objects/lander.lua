@@ -146,6 +146,8 @@ local function moveShip(lander, dt)
 			lander.vy = 0.5
 		end
 
+-- print(lander.name, Cf.round(lander.vx,2), Cf.round(lander.vy,2), dt)
+
 		-- used to determine speed right before touchdown
 		LANDER_VY = lander.vy
 		LANDER_VX = lander.vx
@@ -247,7 +249,7 @@ local function checkForContact(lander, dt)
 				assert(moduleIndexToDestroy > 0)
 				table.remove(lander.modules, moduleIndexToDestroy)
 				-- adjust new mass
-				DEFAULT_MASS = recalcDefaultMass(lander)
+				lander.currentMass = recalcDefaultMass(lander)
 			end
 		end
 
@@ -335,7 +337,7 @@ local function buyModule(module, lander)
 			lander.money = lander.money - module.cost
 			-- add and calculate new mass
 			lander.mass[#lander.mass+1] = module.mass
-			DEFAULT_MASS = recalcDefaultMass(lander)
+			lander.currentMass = recalcDefaultMass(lander)
 		else
 			-- play 'failed' sound
 			failSound:play()
@@ -433,8 +435,10 @@ function Lander.create(name)
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
 	end
+	lander.currentMass = 220 		-- default mass
+	-- ** if adding attributes then update the RESET function as well
 
-	-- mass
+	-- all the items that have mass
 	lander.mass = {}
 	-- base mass of lander
 	table.insert(lander.mass, 100)
@@ -450,6 +454,8 @@ function Lander.create(name)
 	-- modules
 	-- this will be strings/names of modules
 	lander.modules = {}
+
+
 
 	return lander
 end
@@ -474,7 +480,7 @@ function Lander.reset(lander)
 	lander.money = 0
 	lander.gameOver = false
 	lander.score = lander.x - ORIGIN_X
-	-- lander.name = name or CURRENT_PLAYER_NAME
+	lander.currentMass = 220 		-- default mass
 
 	-- mass
 	lander.mass = {}
@@ -540,11 +546,8 @@ function Lander.doThrust(lander, dt)
 
 		-- adjust the thrust based on ship mass
 		-- less mass = higher ratio = more thrust = less fuel needed to move
-		local massRatio = DEFAULT_MASS / Lander.getMass(lander)
+		local massRatio = 220 / Lander.getMass(lander)	-- 220 is the mass of a 'normal' lander
 		-- for debugging only
-		if GAME_CONFIG.showDEBUG then
-			MASS_RATIO = massRatio
-		end
 
 		lander.engineOn = true
 		forceX = forceX * massRatio
@@ -569,7 +572,6 @@ function Lander.doThrust(lander, dt)
 	end
 end
 
-
 function Lander.update(dt)
 
 	for k, lander in pairs(LANDERS) do
@@ -577,7 +579,8 @@ function Lander.update(dt)
 		local keyDown = love.keyboard.isDown
 
 	    if keyDown("up") or keyDown("w") or keyDown("kp8") then
-	        Lander.doThrust(lander, dt)
+			-- bot has it's own thrust routines
+			if not lander.isBot then Lander.doThrust(lander, dt) end
 	    end
 		-- rotate the lander anti-clockwise
 	    if keyDown("left") or keyDown("a") or keyDown("kp4") then
@@ -691,8 +694,8 @@ function Lander.draw()
 				drawGuidance(lander)
 			end
 
-			love.graphics.circle("line", predictedx, predictedy, 5)
-			love.graphics.circle("line", predictedx, perfecty, 10)
+			love.graphics.circle("line", predictedx - WORLD_OFFSET, predictedy, 5)
+			love.graphics.circle("line", predictedx - WORLD_OFFSET, perfecty, 10)
 		end
 	end
 end

@@ -22,20 +22,22 @@ local function GetCurrentState(lander)
     currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
     currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
 
-    predictedx = lander.x + (lander.vx * lookahead) - WORLD_OFFSET
+    predictedx = lander.x + (lander.vx * lookahead)
     predictedy = lander.y + (lander.vy * lookahead)
-    predictedYgroundValue = GROUND[Cf.round(predictedx + WORLD_OFFSET,0)]
+    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
 
--- print(predictedx, Cf.round(predictedx + WORLD_OFFSET ))
-    assert(predictedYgroundValue ~= nil)
+    if predictedYgroundValue == nil then
+        print(predictedx,predictedy,predictedYgroundValue)
+        error("oops")
+    end
 
     -- negative value means not yet past the base
-    currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
+    currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx, Enum.basetypeFuel)
 
     -- searching for a base can outstrip the terrain so guard against that.
     while closestbase.x == nil do
         Terrain.generate(SCREEN_WIDTH * 2)
-        currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx + WORLD_OFFSET, Enum.basetypeFuel)
+        currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx, Enum.basetypeFuel)
 print("Adding more terrain")
     end
 
@@ -107,27 +109,27 @@ local function DetermineAction(lander, dt)
             -- turn to 315
             turnTowardsAngle(lander, 315, dt)
             Lander.doThrust(lander, dt)
-        end
-        if toolow and toofast then
+        elseif toolow and toofast then
             -- turn to 235
             turnTowardsAngle(lander, 235, dt)
             Lander.doThrust(lander, dt)
-        end
-        if toohigh and toofast then
+        elseif toohigh and toofast then
             -- turn left
             turnTowardsAngle(lander, 180, dt)
             if lander.angle < 215 then
                 Lander.doThrust(lander, dt)
             end
-        end
-        if toohigh and tooslow then
+        elseif toohigh and tooslow then
             turnTowardsAngle(lander, 359, dt)
+            if lander.angle > 345 then
+                Lander.doThrust(lander, dt)
+            end
+        else
+print("undedetected scenario")
         end
-        if lander.angle > 345 then
-            Lander.doThrust(lander, dt)
-        end
-
     else
+        -- is on base or close to base or refuelling
+        -- do nothing
     end
 end
 

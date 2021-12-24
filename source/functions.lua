@@ -266,7 +266,6 @@ end
 
 function functions.GetDistanceToFueledBase(xvalue, intBaseType)
 	-- returns two values: the distance to the closest base with fuel, and the object/table item for that base
-	-- if there are no bases (impossible) then the distance value returned will be -1
 	-- note: if distance is a negative value then the Lander has not yet passed the base
 	local closestdistance = -1
 	local closestbase = {}
@@ -293,7 +292,7 @@ function functions.GetDistanceToFueledBase(xvalue, intBaseType)
 		realdist = xvalue - (closestbase.x + 85)
 	end
 
-	return  realdist, closestbase
+	return realdist, closestbase
 end
 
 function functions.ResetGame()
@@ -381,6 +380,7 @@ print("charlie")
 		else
 			local newLander = Lander.create()
 			newLander.isBot = true
+			newLander.name = "Bot"
 			table.insert(LANDERS, newLander)
 		end
 	else

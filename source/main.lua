@@ -113,16 +113,12 @@ LANDERS = {}
 GROUND = {}			-- stores the y value for the ground
 OBJECTS = {}		-- stores objects that need to be drawn
 SHOP_MODULES = {}
-MASS_RATIO = 0		-- for debugging only. Records current mass/default mass ratio
 GAME_SETTINGS = {}	-- track game settings
 GAME_CONFIG = {}	-- tracks the user defined settings for modules turned on and off
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
 ORIGIN_X = Cf.round(SCREEN_WIDTH / 2, 0)
 WORLD_OFFSET = ORIGIN_X
-
--- this is the mass the lander starts with hence the mass the noob engines are tuned to
-DEFAULT_MASS = 220
 
 -- track speed of the lander to detect crashes etc
 LANDER_VX = 0
@@ -274,7 +270,7 @@ function love.load()
 	Fun.ResetGame()
 
 	-- capture the 'normal' mass of the lander into a global variable
-	DEFAULT_MASS = Lander.getMass(LANDERS[1])
+	LANDERS[1].currentMass = Lander.getMass(LANDERS[1])
 
 	LovelyToasts.options.queueEnabled = true
 
