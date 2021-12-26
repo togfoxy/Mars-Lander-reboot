@@ -45,5 +45,15 @@ https://togfox.itch.io/mars-lander
 
 - download and run the love file
 
+### Android installation
+
+- requires LOVE for Android: https://play.google.com/store/apps/details?id=org.love2d.android&hl=en&gl=US
+
+- download the LOVE file onto your mobile (see instructions for Love for Android)
+
+- open the LOVE file to play
+
+- not available as APK and not available on playstore
+
 
 
