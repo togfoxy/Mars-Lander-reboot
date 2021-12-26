@@ -9,6 +9,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 ### Added
 - a new 'guidance unit' upgrade
 - added a bot to fly against. Set in options menu
+- high score now shows the players (or bots) name
 
 ### Changed
 - adjusted the volume on audio files
