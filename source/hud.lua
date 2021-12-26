@@ -250,6 +250,9 @@ local function drawDebug()
 
 		local text = Cf.round(lander.x) .. "  " .. Cf.round(lander.y) .. "  " .. Cf.round(lander.vx,3) .. "  " .. Cf.round(lander.vy,3)
 		love.graphics.print(text, lander.x - WORLD_OFFSET + 20, lander.y + 20)
+		
+		love.graphics.circle("line", predictedx - WORLD_OFFSET, predictedy, 5)
+		love.graphics.circle("line", predictedx - WORLD_OFFSET, perfecty, 10)
 	end
 end
 

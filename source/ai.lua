@@ -18,26 +18,64 @@ local toofast
 local closestbase       -- object
 local lookahead = 240		-- how far to look ahead
 
+local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
+	-- uuid is the lander ID. This is needed as each lander has their own instance of fuel bases
+	-- returns two values: the distance to the closest base with fuel, and the object/table item for that base
+	-- note: if distance is a negative value then the Lander has not yet passed the base
+	local closestdistance = -1
+	local closestbase = {}
+	local absdist
+	local dist
+	local realdist
+
+	for k,v in pairs(OBJECTS) do
+		if v.objecttype == intBaseType then
+			if v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1 then
+				-- the + bit is an offset to calculate the landing pad and not the image
+				absdist = math.abs(xvalue - (v.x + 85))
+				-- same but without the math.abs)
+				dist = (xvalue - (v.x + 85))
+				if closestdistance == -1 or absdist <= closestdistance then
+					closestdistance = absdist
+					closestbase = v
+				end
+			end
+		end
+	end
+
+	-- now we have the closest base, work out the distance to the landing pad for that base
+	if closestbase.x ~= nil then
+		-- the + bit is an offset to calculate the landing pad and not the image
+		realdist = xvalue - (closestbase.x + 85)
+	end
+
+	return realdist, closestbase
+end
+
+
 local function GetCurrentState(lander)
     currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
     currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
 
+	-- predictedx is the x value the lander is predicted to be at based on current trajectory
+	-- predictedy is the y value the lander is predicted to be at based on current trajectory
+	-- predictedYgroundValue is the y value for the terrain when looking ahead
     predictedx = lander.x + (lander.vx * lookahead)
     predictedy = lander.y + (lander.vy * lookahead)
     predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
 
     if predictedYgroundValue == nil then
-        print(#GROUND, predictedx,predictedy,predictedYgroundValue)
+        print(#GROUND, predictedx, predictedy, predictedYgroundValue)
         error("oops - check the console for debug info")
     end
 
     -- negative value means not yet past the base
-    currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx, Enum.basetypeFuel)
+    currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 
     -- searching for a base can outstrip the terrain so guard against that.
     while closestbase.x == nil do
         Terrain.generate(SCREEN_WIDTH * 4)
-        currentDistanceToBase, closestbase = Fun.GetDistanceToFueledBase(predictedx, Enum.basetypeFuel)
+        currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 print("Adding more terrain")
     end
 

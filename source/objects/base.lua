@@ -19,8 +19,6 @@ landingLights.animation = Assets.newAnimation("landingLights", landingLights.ima
 local baseOn    = Assets.getImageSet("fuelbaseOn")
 local baseOff   = Assets.getImageSet("fuelbaseOff")
 
-
-
 -- ~~~~~~~~~~~~~~~~~
 -- Public functions
 -- ~~~~~~~~~~~~~~~~~

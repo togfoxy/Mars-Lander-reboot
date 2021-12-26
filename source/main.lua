@@ -263,9 +263,6 @@ function love.load()
 
 	Fun.ResetGame()
 
-	-- capture the 'normal' mass of the lander into a global variable
-	LANDERS[1].currentMass = Lander.getMass(LANDERS[1])
-
 	LovelyToasts.options.queueEnabled = true
 
 	-- Initalize GUI Library

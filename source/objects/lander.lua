@@ -157,18 +157,34 @@ end
 local function refuelLander(lander, base, dt)
 	-- drain fuel from the base and add it to the lander
 	-- base is an object/table item from OBJECTS
-	local refuelAmount = math.min(base.totalFuel, (lander.fuelCapacity - lander.fuel), dt)
-	base.totalFuel	= base.totalFuel - refuelAmount
-	lander.fuel		= lander.fuel + refuelAmount
-	-- disable the base if the tanks are empty
-	if base.totalFuel <= 0 then base.active = false end
+	-- to enable bots and other players to have their own instances of bases and fuel supplies
+	--		base.fuelLeft[uuid] is a table inside the OBJECTS table that tracks the fuel used by each lander.
+	--		This enables each lander to user their own fuel supply.
+	--		The image/graphics reflects only lander[1] (the player)
+	local refuelAmount
+	
+	if lander.isPlayer then
+		-- lander is the player		-! what happens in multiplayer!?!
+		refuelAmount = math.min(base.totalFuel, (lander.fuelCapacity - lander.fuel), dt)
+		base.totalFuel = base.totalFuel - refuelAmount
+	
+		-- disable the base if the tanks are empty
+		if base.totalFuel <= 0 then base.active = false end
+	else
+		-- initialse the subtable
+		if base.fuelLeft[lander.uuid] == nil then base.fuelLeft[lander.uuid] = Enum.baseMaxFuel end
+		
+		refuelAmount = math.min(base.fuelLeft[lander.uuid], (lander.fuelCapacity - lander.fuel), dt)
+		base.fuelLeft[lander.uuid] = base.fuelLeft[lander.uuid] - refuelAmount
+	end
+	lander.fuel	= lander.fuel + refuelAmount
 end
 
 local function payLanderFromBase(lander, base, baseDistance)
 	-- pay some money based on distance to the base
 	-- base is an object/table item from OBJECTS
 	local distance = math.abs(baseDistance)
-	if not base.paid then
+	if not base.hasLanded[lander.uuid] then
 		lander.money = Cf.round(lander.money + (100 - distance),0)
 		landingSound:play()
 	end
@@ -272,14 +288,19 @@ local function checkForContact(lander, dt)
 			payLanderFromBase(lander, bestBase, bestDistance)
 			-- pay the lander on first visit on the base
 			-- this is the first landing on this base so pay money based on vertical and horizontal speed
-			if not bestBase.paid then
+			if bestBase.hasLanded[lander.uuid] == nil then bestBase.hasLanded[lander.uuid] = false end 
+			if not bestBase.hasLanded[lander.uuid] then
 				payLanderForControl(lander, bestBase)
 
 				local stopMoney = lander.money
 				local moneyEarned = stopMoney - startMoney
 				myBubble = createBubbleText(lander, moneyEarned)
 
-				bestBase.paid = true
+				-- only set PAID if the lander is the player
+				if lander.isPlayer then bestBase.paid = true end
+
+				bestBase.hasLanded[lander.uuid] = true 
+			
 			-- check for game-over conditions
 			elseif not bestBase.active and lander.fuel <= 1 then
 				lander.gameOver = true
@@ -416,6 +437,7 @@ end
 function Lander.create(name)
 	-- create a lander and return it to the calling sub
 	local lander = {}
+	lander.uuid = Cf.Getuuid()
 	lander.x = Cf.round(ORIGIN_X,0)
 	lander.y = GROUND[lander.x] - 20	-- 20 is the image offset so it appears to be on the ground
 	lander.connectionID = nil	-- used by enet
@@ -434,12 +456,13 @@ function Lander.create(name)
 	lander.score = lander.x - ORIGIN_X
 	lander.name = name or CURRENT_PLAYER_NAME
 	lander.isBot = false
+	lander.isPlayer = false		-- can be a bot, ai, player or opponent (human)
 
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
 	end
 	lander.currentMass = 220 		-- default mass
-	-- ** if adding attributes then update the RESET function as well
+	-- ** if adding attributes then update the RESET function as well (if applicable)
 
 	-- all the items that have mass
 	lander.mass = {}
@@ -701,8 +724,7 @@ function Lander.draw()
 				drawGuidance(lander)
 			end
 
-			love.graphics.circle("line", predictedx - WORLD_OFFSET, predictedy, 5)
-			love.graphics.circle("line", predictedx - WORLD_OFFSET, perfecty, 10)
+
 		end
 	end
 end

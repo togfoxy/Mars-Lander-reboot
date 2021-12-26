@@ -7,9 +7,11 @@ function createobjects.CreateObject(intType, intXValue)
 	local mybase = {}
 	mybase.x = intXValue			-- where on the map this object is positioned.
 	mybase.objecttype = intType		-- 2 = a fuel base
-	mybase.totalFuel = 0
+	mybase.totalFuel = 0			-- used by the player and also drives the graphics/images
 	mybase.active = true
 	mybase.paid = false				-- set true when lander lands and pays player. Ensures bases only pay once
+	mybase.fuelLeft = {}			-- this is to track the fuel used by bots and AI (not the player)
+	mybase.hasLanded = {}			-- tracks which lander has landed on each base
 
 	if intType == Enum.basetypeFuel then
 		mybase.totalFuel = Enum.baseMaxFuel
