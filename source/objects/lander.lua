@@ -408,6 +408,7 @@ local function updateScore(lander)
 
 	if lander.score > GAME_SETTINGS.HighScore then
 		GAME_SETTINGS.HighScore = lander.score
+		GAME_SETTINGS.HighScoreName = lander.name
 		Fun.SaveGameSettings() -- this needs to be refactored somehow, not save every change
 	end
 end
