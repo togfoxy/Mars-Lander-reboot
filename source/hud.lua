@@ -141,39 +141,6 @@ local function drawHealthIndicator(lander)
 	love.graphics.setColor(1,1,1,1)
 end
 
-local function drawShopMenu()
-	-- draws a menu to buy lander parts. This is text based. Hope to make it a full GUI at some point.
-	local gameOver = LANDERS[1].gameOver
-	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], Enum.basetypeFuel)
-	if not gameOver and isOnLandingPad then
-
-		Assets.setFont("font20")
-
-		-- Create List of available modules
-		local y = SCREEN_HEIGHT * 0.33
-
-		for k,module in ipairs(SHOP_MODULES) do
-			if module.allowed == nil or module.allowed == true then
-				local string = "%s. Buy %s - $%s \n"
-				itemListString = string.format(string, k, module.name, module.cost)
-				local color = {1, 1, 1, 1}
-				if Lander.hasUpgrade(LANDERS[1], module) then
-					color = {.8, .1, .1, .5}
-				end
-				love.graphics.setColor(color)
-				love.graphics.printf(itemListString, 0, y, SCREEN_WIDTH, "center")
-
-				-- print boxes around the menu items
-				--love.graphics.rectangle("line", SCREEN_WIDTH / 2.66, y, SCREEN_WIDTH / 4, 40)
-
-				y = y + 20
-
-			end
-			love.graphics.setColor(1, 1, 1, 1)
-		end
-	end
-end
-
 local function newdrawShopMenu()
 	local gameOver = LANDERS[1].gameOver
 	local isOnLandingPad = Lander.isOnLandingPad(LANDERS[1], Enum.basetypeFuel)
@@ -198,6 +165,7 @@ local function newdrawShopMenu()
 			end
 		end
 	end
+	love.graphics.setColor(1,1,1,1)
 end
 
 local function drawGameOver()
@@ -231,7 +199,7 @@ local function drawScore()
 
 	-- print high score
 	local highscore = Cf.strFormatThousand(Cf.round(GAME_SETTINGS.HighScore))
-	love.graphics.print("High Score: " .. highscore, (SCREEN_WIDTH / 2) - 75, 90)
+	love.graphics.print("High Score: " .. highscore .. " (" .. GAME_SETTINGS.HighScoreName .. ")", (SCREEN_WIDTH / 2) - 75, 90)
 end
 
 local function drawDebug()
@@ -308,7 +276,6 @@ function HUD.draw()
 	if lander.gameOver then
 		drawGameOver()
 	elseif lander.onGround then
-		-- drawShopMenu()
 		newdrawShopMenu()
 	end
 

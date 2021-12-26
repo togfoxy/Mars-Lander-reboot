@@ -151,6 +151,9 @@ function functions.LoadGameSettings()
 	if GAME_SETTINGS.HighScore == nil then
 		GAME_SETTINGS.HighScore = 0
 	end
+	if GAME_SETTINGS.HighScoreName == nil then
+		GAME_SETTINGS.HighScoreName = ""
+	end
 
 	-- Set the gloal player name to the new value
 	CURRENT_PLAYER_NAME = GAME_SETTINGS.PlayerName

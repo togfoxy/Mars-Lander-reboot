@@ -61,22 +61,22 @@ local function GetCurrentState(lander)
 	-- predictedy is the y value the lander is predicted to be at based on current trajectory
 	-- predictedYgroundValue is the y value for the terrain when looking ahead
     predictedx = lander.x + (lander.vx * lookahead)
+    -- negative value means not yet past the base
+    currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
+    -- searching for a base can outstrip the terrain so guard against that.
+    while closestbase.x == nil or predictedx > #GROUND do
+        Terrain.generate(SCREEN_WIDTH * 4)
+        currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
+print("Adding more terrain")
+    end
+
+	-- ensure this block is below the above WHILE loop
     predictedy = lander.y + (lander.vy * lookahead)
-    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
+    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]	
 
     if predictedYgroundValue == nil then
         print(#GROUND, predictedx, predictedy, predictedYgroundValue)
         error("oops - check the console for debug info")
-    end
-
-    -- negative value means not yet past the base
-    currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
-
-    -- searching for a base can outstrip the terrain so guard against that.
-    while closestbase.x == nil do
-        Terrain.generate(SCREEN_WIDTH * 4)
-        currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
-print("Adding more terrain")
     end
 
     -- ensure this is after the terrain.generate
