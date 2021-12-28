@@ -12,8 +12,32 @@ local tooleft, tooright
 local tooslow, toofast
 local closestbase       		-- object
 local lookahead = 240			-- how far to look ahead
-local ygap, vxgap				-- how far the predicted location is off-target
+local ygap1, vxgap1				-- how far the predicted location is off-target
+local ygap2, vxgap2
 local nextaction = 0
+
+local function printQTable(qt)
+	-- prints the provided qtable out to the console with a small amount of formatting
+	-- print table
+	for index, data in pairs(qt) do
+		print(index)
+
+		for key, value in pairs(data) do
+			print('\t', key, value)
+		end
+	end
+end
+
+function AI.initialise()
+	local qtable = {}
+	qtable["toolowtoofast"] = {}
+	qtable["toolowtoofast"]["nothrust"] = nil
+	qtable["toolowtoofast"]["nothrust"] = 1.5
+
+	qtable["toolowtoofast"]["thrust270"] = nil
+	qtable["toolowtoofast"]["thrust270"] = 2.2
+
+end
 
 local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 	-- uuid is the lander ID. This is needed as each lander has their own instance of fuel bases
@@ -57,6 +81,7 @@ local function GetCurrentState(lander)
 	-- predictedy is the y value the lander is predicted to be at based on current trajectory
 	-- predictedYgroundValue is the y value for the terrain when looking ahead
     predictedx = lander.x + (lander.vx * lookahead)
+	if predictedx < 0 then predictedx = 0 end
     -- negative value means not yet past the base
     currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
     -- searching for a base can outstrip the terrain so guard against that.
@@ -67,13 +92,13 @@ local function GetCurrentState(lander)
 
 	-- ensure this block is below the above WHILE loop
     predictedy = lander.y + (lander.vy * lookahead)
-    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]	
+    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
 
     if predictedYgroundValue == nil then
         print(#GROUND, predictedx, predictedy, predictedYgroundValue)
         error("oops - check the console for debug info")
     end
-    
+
     -- look far ahead for long distances
 	-- ensure this is after the terrain.generate
     if math.abs(currentDistanceToBase) > 2000 then
@@ -95,8 +120,8 @@ local function GetCurrentState(lander)
         toohigh = false
         toolow = true
 	else
-		toohigh = false 
-		toolow = false 
+		toohigh = false
+		toolow = false
     end
 
     if currentDistanceToBase < 0 then
@@ -113,72 +138,41 @@ local function GetCurrentState(lander)
     elseif lander.vx > perfectvx * 1.1 then
         tooslow = false
         toofast = true
-	else 
-		tooslow = false 
-		toofast = false 
+	else
+		tooslow = false
+		toofast = false
     end
-	
-	-- capture the 'before' state so it can be checked after an action
-	ygap = perfecty - predictedy
-	dxgap = lander.vx - perfectvx
 
-end
+	-- return the two key values
+	yvariable = perfecty - predictedy		-- this is the y gap
+	vxvariable = lander.vx - perfectvx		-- this is the vx gap
 
-local function printQTable(qt)
-	-- prints the provided qtable out to the console with a small amount of formatting
-	-- print table
-	for index, data in pairs(qt) do
-		print(index)
-
-		for key, value in pairs(data) do
-			print('\t', key, value)
-		end
-	end
-end
-
-function AI.initialise()
-	local qtable = {}
-	qtable["toolowtoofast"] = {}
-	qtable["toolowtoofast"]["nothrust"] = nil
-	qtable["toolowtoofast"]["nothrust"] = 1.5
-	
-	qtable["toolowtoofast"]["thrust270"] = nil
-	qtable["toolowtoofast"]["thrust270"] = 2.2
-	
+	-- print(yvariable ,vxvariable)
+	return yvariable ,vxvariable
 end
 
 local function DetermineAction(lander, dt)
 
 	local explorerate = 25		-- %
-	
+
 	-- check if lander already has an action
 	if lander.currentAction == Enum.AIActionNothing then
-	
+
 		if love.math.random(1,100) <= explorerate then
 			-- explorative. Choose any random action
 			nextaction = love.math.random(1, Enum.AIActionNumbers)
-nextaction = 6	
-			lander.measureNow = false		
-		else 
-		
-		
-		end 
-
+			-- nextaction = 6
+			lander.currentAction = nextaction
+			lander.currentActionTimer = 0
+		else
+		end
 	end
-	
--- print(nextaction)
-
-	lander.currentAction = nextaction
-	
-	
+	-- print(nextaction)
 end
 
 local function ExecuteAction(lander, dt)
-
 	if lander.currentAction ~= Enum.AIActionNothing then
-	
 		if lander.currentAction == Enum.AIActionWait then
-	
 		elseif lander.currentAction == Enum.AIActionThrust180 then
 			Bot.turnTowardsAngle(lander, 180, dt)
 			if lander.angle < 190 then
@@ -194,83 +188,68 @@ local function ExecuteAction(lander, dt)
 			if lander.angle > 230 or lander.angle < 250 then
                 Lander.doThrust(lander, dt)
             end
-		
 		elseif lander.currentAction == Enum.AIActionThrust270 then
 			Bot.turnTowardsAngle(lander, 270, dt)
 			if lander.angle > 260 or lander.angle < 280 then
                 Lander.doThrust(lander, dt)
-            end		
+            end
 		elseif lander.currentAction == Enum.AIActionThrust300 then
 			Bot.turnTowardsAngle(lander, 300, dt)
 			if lander.angle > 290 or lander.angle < 310 then
                 Lander.doThrust(lander, dt)
-            end		
+            end
 		elseif lander.currentAction == Enum.AIActionThrust330 then
 			Bot.turnTowardsAngle(lander, 330, dt)
 			if lander.angle > 320 or lander.angle < 340 then
                 Lander.doThrust(lander, dt)
-            end		
+            end
 		elseif lander.currentAction == Enum.AIActionThrust360 then
 			Bot.turnTowardsAngle(lander, 359, dt)
 			if lander.angle > 350 then
                 Lander.doThrust(lander, dt)
-            end		
-		else 
+            end
+		else
 			error("Something impossible happened.")
 		end
 	end
-
 end
 
-local function MeasureAction(lander, dt)
-	-- capture new gapy and new gapdx to see if AI is doing the right thing.
-	
-	if lander.measureNow then
-	
-		predictedx = lander.x + (lander.vx * lookahead)
-		currentDistanceToBase, closestbase = Bot.GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
-		
-		if math.abs(currentDistanceToBase) > 2000 then
-			lookahead = 240
-		else
-			lookahead = 120
-		end	
-		
-		predictedYgroundValue = GROUND[Cf.round(predictedx,0)]	
-		perfecty = predictedYgroundValue - math.abs(currentDistanceToBase)
-		if perfecty < SCREEN_HEIGHT / 3 then perfecty = SCREEN_HEIGHT / 3 end
-		
-		perfectvx = currentDistanceToBase / -120        -- some constant that determines best vx
-		
-		newygap = perfecty - predictedy
-		newdxgap = lander.vx - perfectvx
-		
-print(ygap, newygap)
-		
-		if newygap > ygap and newdxgap > dxgap then
-			-- wrong action
-			lander.currentAction = AIActionNothing
-		end
-		
-	else 
-	
-		lander.measureNow = true 
+local function RewardAction(lander, dt)
+
+-- print(ygap1 , ygap2 , vxgap1 , vxgap2)
+
+	if math.abs(ygap2) < math.abs(ygap1) and math.abs(vxgap2) < math.abs(vxgap1) then
+		-- continue
+	else
+		-- stop doing wrong action
+		lander.currentAction = Enum.AIActionNothing
+		-- print("stopping wrong action")
 	end
-	
+	ygap1 = nil
+	ygap2 = nil
+	vxgap1 = nil
+	vxgap2 = nil
 end
 
 function AI.update(dt)
     if Fun.CurrentScreenName() == "World" then
         for k, lander in pairs(LANDERS) do
             if lander.isAI then
-				GetCurrentState(lander)
+				if ygap1 == nil then
+					ygap1, vxgap1 = GetCurrentState(lander)
+
+				else
+					ygap2, vxgap2 = GetCurrentState(lander)
+				end
                 DetermineAction(lander, dt)
 				ExecuteAction(lander, dt)
-				MeasureAction(lander, dt)
+				if ygap2 ~= nil then
+					RewardAction(lander, dt)
+				end
             end
         end
     end
-	
+
 
 end
 

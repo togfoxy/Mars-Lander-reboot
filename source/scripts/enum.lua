@@ -25,7 +25,7 @@ return {
 	moduleSideThrusters = 4,
 	moduleParachute = 5,
     moduleGuidance = 6,
-	
+
 	AIActionNothing = 0,
 	AIActionWait = 1,
 	AIActionThrust180 = 2,
@@ -35,9 +35,10 @@ return {
 	AIActionThrust300 = 6,
 	AIActionThrust330 = 7,
 	AIActionThrust360 = 8,
-	
-	AIActionNumbers = 8		-- this is the maximumn number of options. Set to the last AIAction enum value
-	
-	
+
+	AIActionNumbers = 8,		-- this is the maximumn number of options. Set to the last AIAction enum value
+
+    AIMeasureTimer = 0.2        -- how frequently to measure AI actions
+
 
 }

@@ -162,18 +162,18 @@ local function refuelLander(lander, base, dt)
 	--		This enables each lander to user their own fuel supply.
 	--		The image/graphics reflects only lander[1] (the player)
 	local refuelAmount
-	
+
 	if lander.isPlayer then
 		-- lander is the player		-! what happens in multiplayer!?!
 		refuelAmount = math.min(base.totalFuel, (lander.fuelCapacity - lander.fuel), dt)
 		base.totalFuel = base.totalFuel - refuelAmount
-	
+
 		-- disable the base if the tanks are empty
 		if base.totalFuel <= 0 then base.active = false end
 	else
 		-- initialse the subtable
 		if base.fuelLeft[lander.uuid] == nil then base.fuelLeft[lander.uuid] = Enum.baseMaxFuel end
-		
+
 		refuelAmount = math.min(base.fuelLeft[lander.uuid], (lander.fuelCapacity - lander.fuel), dt)
 		base.fuelLeft[lander.uuid] = base.fuelLeft[lander.uuid] - refuelAmount
 	end
@@ -288,7 +288,7 @@ local function checkForContact(lander, dt)
 			payLanderFromBase(lander, bestBase, bestDistance)
 			-- pay the lander on first visit on the base
 			-- this is the first landing on this base so pay money based on vertical and horizontal speed
-			if bestBase.hasLanded[lander.uuid] == nil then bestBase.hasLanded[lander.uuid] = false end 
+			if bestBase.hasLanded[lander.uuid] == nil then bestBase.hasLanded[lander.uuid] = false end
 			if not bestBase.hasLanded[lander.uuid] then
 				payLanderForControl(lander, bestBase)
 
@@ -299,8 +299,8 @@ local function checkForContact(lander, dt)
 				-- only set PAID if the lander is the player
 				if lander.isPlayer then bestBase.paid = true end
 
-				bestBase.hasLanded[lander.uuid] = true 
-			
+				bestBase.hasLanded[lander.uuid] = true
+
 			-- check for game-over conditions
 			elseif not bestBase.active and lander.fuel <= 1 then
 				lander.gameOver = true
@@ -318,7 +318,7 @@ end
 
 local function playSoundEffects(lander)
 
-	if not lander.isBot then
+	if lander.isPlayer then
 		if lander.engineOn then
 			engineSound:play()
 		else
@@ -460,7 +460,7 @@ function Lander.create(name)
 	lander.isAI = false
 	lander.isPlayer = false				-- can be a bot, ai, player or opponent (human)
 	lander.currentAction = 0			-- used by AI
-	lander.measureNow = false
+	lander.currentActionTimer = 0		-- used by AI
 
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
@@ -510,8 +510,8 @@ function Lander.reset(lander)
 	lander.score = lander.x - ORIGIN_X
 	lander.currentMass = 220 			-- default mass
 	lander.currentAction = 0			-- used by AI
-	lander.measureNow = false
-	
+	lander.currentActionTimer = 0		-- used by AI
+
 	-- mass
 	lander.mass = {}
 	-- base mass of lander
