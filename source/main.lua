@@ -97,7 +97,8 @@ Cobjs		= require 'createobjects'
 Fun			= require 'functions'
 Menus		= require 'menus'
 EnetHandler = require 'enetstuff'
-Bot 			= require 'bot'
+Bot 		= require 'bot'
+AI			= require 'AI'
 
 -- ~~~~~~~~~~~~~~~~~
 -- Global variables
@@ -204,8 +205,52 @@ end
 -- main callbacks
 -- ~~~~~~~~~~~~~~~
 
-function love.load()
+function love.keypressed(key, scancode, isrepeat)
+	-- Back to previous screen
+	if key == "escape" then
+		Fun.RemoveScreen()
+	elseif strCurrentScreen == "World" then
+		-- Restart the game. Different to reset a single lander
+		if key == "r" then
+			Fun.ResetGame()
 
+		-- restart just the player lander (for mulitplayer)
+		elseif key == "kpenter" or key == "return" then
+			Lander.reset(LANDERS[1])
+
+		-- Pause the game
+		elseif key == "p" then
+			Fun.AddScreen("Pause")
+
+		-- Open options menu
+		elseif key == "o" then
+			Fun.AddScreen("Settings")
+		end
+
+		-- update Lander keys
+		Lander.keypressed(key, scancode, isrepeat)
+
+	elseif strCurrentScreen == "Pause" then
+		if key == "p" then
+			Fun.RemoveScreen()
+		end
+	elseif strCurrentScreen == "Settings" then
+		--! typing an 'o' in the player name will close the screen so disabling this code for now
+		--if key == "o" then
+			--Fun.RemoveScreen()
+		--end
+	end
+
+end
+
+function love.mousepressed( x, y, button, istouch, presses )
+	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
+	if strCurrentScreen == "World" then
+		HUD.mousepressed( x, y, button, istouch)
+	end
+end
+
+function love.load()
 
     if love.filesystem.isFused() then
 
@@ -231,7 +276,6 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
-
 
 	-- Play music
 	-- true for "isLooping"
@@ -268,6 +312,8 @@ function love.load()
 	-- Initalize GUI Library
 	Slab.SetINIStatePath(nil)
 	Slab.Initialize()
+	
+	AI.initialise()
 end
 
 function love.draw()
@@ -315,50 +361,7 @@ function love.draw()
 	Aspect.stop()
 end
 
-function love.keypressed(key, scancode, isrepeat)
-	-- Back to previous screen
-	if key == "escape" then
-		Fun.RemoveScreen()
-	elseif strCurrentScreen == "World" then
-		-- Restart the game. Different to reset a single lander
-		if key == "r" then
-			Fun.ResetGame()
 
-		-- restart just the player lander (for mulitplayer)
-		elseif key == "kpenter" or key == "return" then
-			Lander.reset(LANDERS[1])
-
-		-- Pause the game
-		elseif key == "p" then
-			Fun.AddScreen("Pause")
-
-		-- Open options menu
-		elseif key == "o" then
-			Fun.AddScreen("Settings")
-		end
-
-		-- update Lander keys
-		Lander.keypressed(key, scancode, isrepeat)
-
-	elseif strCurrentScreen == "Pause" then
-		if key == "p" then
-			Fun.RemoveScreen()
-		end
-	elseif strCurrentScreen == "Settings" then
-		--! typing an 'o' in the player name will close the screen so disabling this code for now
-		--if key == "o" then
-			--Fun.RemoveScreen()
-		--end
-	end
-
-end
-
-function love.mousepressed( x, y, button, istouch, presses )
-	strCurrentScreen = CURRENT_SCREEN[#CURRENT_SCREEN]
-	if strCurrentScreen == "World" then
-		HUD.mousepressed( x, y, button, istouch)
-	end
-end
 
 function love.update(dt)
 

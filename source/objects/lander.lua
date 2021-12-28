@@ -457,6 +457,7 @@ function Lander.create(name)
 	lander.score = lander.x - ORIGIN_X
 	lander.name = name or CURRENT_PLAYER_NAME
 	lander.isBot = false
+	lander.isAI = false
 	lander.isPlayer = false		-- can be a bot, ai, player or opponent (human)
 
 	if GAME_CONFIG.easyMode then
@@ -724,7 +725,6 @@ function Lander.draw()
 			if landerId == 1 then
 				drawGuidance(lander)
 			end
-
 
 		end
 	end

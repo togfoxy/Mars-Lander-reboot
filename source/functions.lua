@@ -11,6 +11,7 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG.music = true
 	GAME_CONFIG.allowGuidance = true
 	GAME_CONFIG.botOn = true
+	GAME_CONFIG.AIOn = true
 end
 
 function functions.configureModules()
@@ -290,7 +291,7 @@ function functions.ResetGame()
 		
 	end
 
-	Fun.processBots()
+	Fun.processBotsandAI()
 
 end
 
@@ -343,8 +344,8 @@ function functions.getAltitude(lander)
 	return groundYValue - landerYValue
 end
 
-function functions.processBots()
-	-- makes sure bots are on or off according to global setting
+function functions.processBotsandAI()
+	-- makes sure bots and AI are on or off according to global setting
 	if GAME_CONFIG.botOn then
 		-- check if bot already exists
 		local botexists = false
@@ -363,6 +364,29 @@ function functions.processBots()
 		-- ensure all bots are destroyed
 		for k,lander in pairs(LANDERS) do
 			if lander.isBot then
+				table.remove(LANDERS, k)
+			end
+		end
+	end
+	
+	if GAME_CONFIG.AIOn then
+		-- check if AI already exists
+		local AIexists = false
+		for k,lander in pairs(LANDERS) do
+			if lander.isAI then AIexists = true end
+		end
+		if AIexists then
+			-- AI is on and AI exists. Do nothing.
+		else
+			local newLander = Lander.create()
+			newLander.isAI = true
+			newLander.name = "AI"
+			table.insert(LANDERS, newLander)
+		end
+	else
+		-- ensure all AI are destroyed
+		for k,lander in pairs(LANDERS) do
+			if lander.isAI then
 				table.remove(LANDERS, k)
 			end
 		end
