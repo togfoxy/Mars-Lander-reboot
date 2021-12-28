@@ -97,7 +97,7 @@ Cobjs		= require 'createobjects'
 Fun			= require 'functions'
 Menus		= require 'menus'
 EnetHandler = require 'enetstuff'
-AI 			= require 'ai'
+Bot 			= require 'bot'
 
 -- ~~~~~~~~~~~~~~~~~
 -- Global variables
@@ -384,6 +384,6 @@ function love.update(dt)
 
 	EnetHandler.update(dt)
 	LovelyToasts.update(dt)
-	AI.update(dt)
+	Bot.update(dt)
 	Aspect.update()
 end
