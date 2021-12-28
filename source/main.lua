@@ -225,6 +225,8 @@ function love.keypressed(key, scancode, isrepeat)
 		-- Open options menu
 		elseif key == "o" then
 			Fun.AddScreen("Settings")
+		elseif key == "t" then
+			AI.printQTable(qtable)
 		end
 
 		-- update Lander keys
@@ -311,7 +313,7 @@ function love.load()
 	-- Initalize GUI Library
 	Slab.SetINIStatePath(nil)
 	Slab.Initialize()
-	
+
 end
 
 function love.draw()
