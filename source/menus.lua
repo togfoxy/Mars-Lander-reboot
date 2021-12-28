@@ -75,7 +75,6 @@ function Menus.DrawMainMenu()
 			Fun.AddScreen("Settings")
 		end
 
-
 		Slab.SetLayoutColumn(3)
 
 		Slab.NewLine()
@@ -334,7 +333,7 @@ function Menus.DrawSettingsMenu()
 		if Slab.CheckBox(GAME_CONFIG.botOn, "Fly with a bot") then
 	        GAME_CONFIG.botOn = not GAME_CONFIG.botOn
 	    end
-		
+
 		if Slab.CheckBox(GAME_CONFIG.AIOn, "Fly with a AI") then
 	        GAME_CONFIG.AIOn = not GAME_CONFIG.AIOn
 	    end

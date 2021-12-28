@@ -38,7 +38,7 @@ return {
 
 	AIActionNumbers = 8,		-- this is the maximumn number of options. Set to the last AIAction enum value
 
-    AIMeasureTimer = 0.2        -- how frequently to measure AI actions
+    AIWaitTimerThreshold = 0.5        -- how frequently to measure AI actions
 
 
 }

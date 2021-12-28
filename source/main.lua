@@ -112,6 +112,7 @@ OBJECTS = {}		-- stores objects that need to be drawn
 SHOP_MODULES = {}
 GAME_SETTINGS = {}	-- track game settings
 GAME_CONFIG = {}	-- tracks the user defined settings for modules turned on and off
+qtable = {}
 
 -- this is the start of the world and the origin that we track as we scroll the terrain left and right
 ORIGIN_X = Cf.round(SCREEN_WIDTH / 2, 0)

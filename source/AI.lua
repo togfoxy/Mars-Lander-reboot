@@ -15,7 +15,6 @@ local lookahead = 240			-- how far to look ahead
 local ygap1, vxgap1				-- how far the predicted location is off-target
 local ygap2, vxgap2
 local nextaction = 0
-qtable = {}
 
 function AI.printQTable(qt)
 	-- prints the provided qtable out to the console with a small amount of formatting
@@ -115,15 +114,6 @@ local function GetCurrentState(lander)
 		toohigh = false
 		toolow = false
     end
-
-    if currentDistanceToBase < 0 then
-        tooleft = true
-        tooright = false
-    else
-        tooleft = false
-        tooright = true
-    end
-
     if lander.vx < perfectvx * 0.9 then
         tooslow = true
         toofast = false
@@ -134,6 +124,15 @@ local function GetCurrentState(lander)
 		tooslow = false
 		toofast = false
     end
+	if currentDistanceToBase < 0 then
+		tooleft = true
+		tooright = false
+	else
+		tooleft = false
+		tooright = true
+	end
+
+	-- print(tooleft, tooright, toolow, toohigh, tooslow, toofast, predictedy, perfecty)
 
 	-- return the two key values
 	yvariable = perfecty - predictedy		-- this is the y gap
@@ -156,15 +155,24 @@ local function DetermineAction(lander, dt)
 			-- choose best action from qtable
 			-- construct index1
 			-- create index1
+			if tooleft then
+				index1 = "tooleft"
+			else
+				index1 = "tooright"
+			end
 			if toohigh then
-				index1 = "toohigh"
+				index1 = index1 .. "toohigh"
 			elseif toolow then
-				index1 = "toolow"
+				index1 = index1 .. "toolow"
+			else
+				index1 = index1 .. "rightalt"
 			end
 			if tooslow then
 				index1 = index1 .. "tooslow"
 			elseif toofast then
 				index1 = index1 .. "toofast"
+			else
+				index1 = index1 .. "rightspeed"
 			end
 
 			-- scan all actions for index1 and choose the highest value
@@ -210,6 +218,12 @@ end
 local function ExecuteAction(lander, dt)
 	if lander.currentAction ~= Enum.AIActionNothing then
 		if lander.currentAction == Enum.AIActionWait then
+			-- lander will wait for a specified time before choosing a new action
+			lander.waitTimer = lander.waitTimer + dt
+			if lander.waitTimer > Enum.AIWaitTimerThreshold then
+				lander.waitTimer = 0
+				lander.currentAction = Enum.AIActionNothing
+			end
 		elseif lander.currentAction == Enum.AIActionThrust180 then
 			Bot.turnTowardsAngle(lander, 180, dt)
 			if lander.angle < 190 then
@@ -253,23 +267,34 @@ end
 
 local function RewardAction(lander, dt)
 
--- print(ygap1 , ygap2 , vxgap1 , vxgap2)
+-- print(ygap1 , ygap2)
+-- print("~~~")
 
 	local index1, index2
+	local rewardvalue = 0
 
-	if lander.currentAction ~= Enum.AIActionNothing then
-
+	-- only take measurements when the engine is actually on and impacting speed/direction
+	if lander.currentAction ~= Enum.AIActionNothing and lander.engineOn then
 		-- update the Qtable
 		-- create index1
+		if tooleft then
+			index1 = "tooleft"
+		else
+			index1 = "tooright"
+		end
 		if toohigh then
-			index1 = "toohigh"
+			index1 = index1 .. "toohigh"
 		elseif toolow then
-			index1 = "toolow"
+			index1 = index1 .. "toolow"
+		else
+			index1 = index1 .. "rightalt"
 		end
 		if tooslow then
 			index1 = index1 .. "tooslow"
 		elseif toofast then
 			index1 = index1 .. "toofast"
+		else
+			index1 = index1 .. "rightspeed"
 		end
 
 		-- create index2
@@ -292,28 +317,34 @@ local function RewardAction(lander, dt)
 		end
 
 		-- larger is better
-		local rewardvalue = (ygap1 - ygap2) + (vxgap1 - vxgap2)
+		rewardvalue = (math.abs(ygap1) - math.abs(ygap2)) + ((math.abs(vxgap1) - math.abs(vxgap2)) * 2000)
+
+print(index1, index2, rewardvalue, Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
+
+		if rewardvalue < -300 or rewardvalue > 700 then
+			print()
+			AI.printQTable(qtable)
+			error()
+		end
+
+		-- print(tooleft, tooright, toolow, toohigh, tooslow, toofast, predictedy, perfecty, rewardvalue)
+		-- print(ygap1, ygap2)
 
 		if qtable[index1] == nil then
 			qtable[index1] = {}
 		end
 		if qtable[index1][index2] == nil then
-			print(index1, index2, lander.currentAction)
 			qtable[index1][index2] = rewardvalue
 		else
 			-- do some dodgy averaging
 			qtable[index1][index2] = (qtable[index1][index2] + rewardvalue) / 2
 		end
 
-		-- check to see if this action should continue
-		if math.abs(ygap2) < math.abs(ygap1) and math.abs(vxgap2) < math.abs(vxgap1) then
-			-- continue
-		else
-			-- stop doing wrong action
-			lander.currentAction = Enum.AIActionNothing
-			-- print("stopping wrong action")
-		end
+		-- clear a negative action
+		if rewardvalue < 0 then lander.currentAction = Enum.AIActionNothing end
 	end
+
+-- print(index1, index2, rewardvalue, nil, Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
 
 	ygap1 = nil
 	ygap2 = nil
@@ -329,7 +360,9 @@ function AI.update(dt)
 					ygap1, vxgap1 = GetCurrentState(lander)
 				else
 					ygap2, vxgap2 = GetCurrentState(lander)
+
 				end
+
                 DetermineAction(lander, dt)
 				ExecuteAction(lander, dt)
 				if ygap2 ~= nil then
