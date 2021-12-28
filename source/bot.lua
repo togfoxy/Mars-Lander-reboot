@@ -15,10 +15,10 @@ local tooleft
 local tooright
 local tooslow
 local toofast
-local closestbase       -- object
+local closestbase       	-- object
 local lookahead = 240		-- how far to look ahead
 
-local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
+function Bot.GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 	-- uuid is the lander ID. This is needed as each lander has their own instance of fuel bases
 	-- returns two values: the distance to the closest base with fuel, and the object/table item for that base
 	-- note: if distance is a negative value then the Lander has not yet passed the base
@@ -61,11 +61,11 @@ local function GetCurrentState(lander)
 	-- predictedYgroundValue is the y value for the terrain when looking ahead
     predictedx = lander.x + (lander.vx * lookahead)
     -- negative value means not yet past the base
-    currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
+    currentDistanceToBase, closestbase = Bot.GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
     -- searching for a base can outstrip the terrain so guard against that.
     while closestbase.x == nil or predictedx > #GROUND do
         Terrain.generate(SCREEN_WIDTH * 4)
-        currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
+        currentDistanceToBase, closestbase = Bot.GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 print("Adding more terrain")
     end
 
@@ -124,7 +124,7 @@ print("Adding more terrain")
 
 end
 
-local function turnTowardsAngle(lander, angle, dt)
+function Bot.turnTowardsAngle(lander, angle, dt)
     -- given an angle, turn left or right to meet it
     if lander.angle < angle then
         -- turn right/clockwise
@@ -156,20 +156,20 @@ local function DetermineAction(lander, dt)
     if takeaction then
         if toolow and tooslow then
             -- turn to 315
-            turnTowardsAngle(lander, 315, dt)
+            Bot.turnTowardsAngle(lander, 315, dt)
             Lander.doThrust(lander, dt)
         elseif toolow and toofast then
             -- turn to 235
-            turnTowardsAngle(lander, 235, dt)
+            Bot.turnTowardsAngle(lander, 235, dt)
             Lander.doThrust(lander, dt)
         elseif toohigh and toofast then
             -- turn left
-            turnTowardsAngle(lander, 180, dt)
+            Bot.turnTowardsAngle(lander, 180, dt)
             if lander.angle < 215 then
                 Lander.doThrust(lander, dt)
             end
         elseif toohigh and tooslow then
-            turnTowardsAngle(lander, 359, dt)
+            Bot.turnTowardsAngle(lander, 359, dt)
             if lander.angle > 345 then
                 Lander.doThrust(lander, dt)
             end

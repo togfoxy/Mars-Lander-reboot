@@ -240,7 +240,6 @@ function love.keypressed(key, scancode, isrepeat)
 			--Fun.RemoveScreen()
 		--end
 	end
-
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
@@ -359,8 +358,6 @@ function love.draw()
 
 	Aspect.stop()
 end
-
-
 
 function love.update(dt)
 

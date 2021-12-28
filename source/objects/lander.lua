@@ -458,7 +458,9 @@ function Lander.create(name)
 	lander.name = name or CURRENT_PLAYER_NAME
 	lander.isBot = false
 	lander.isAI = false
-	lander.isPlayer = false		-- can be a bot, ai, player or opponent (human)
+	lander.isPlayer = false				-- can be a bot, ai, player or opponent (human)
+	lander.currentAction = 0			-- used by AI
+	lander.measureNow = false
 
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
@@ -483,8 +485,6 @@ function Lander.create(name)
 	-- this will be strings/names of modules
 	lander.modules = {}
 
-
-
 	return lander
 end
 
@@ -508,8 +508,10 @@ function Lander.reset(lander)
 	lander.money = 0
 	lander.gameOver = false
 	lander.score = lander.x - ORIGIN_X
-	lander.currentMass = 220 		-- default mass
-
+	lander.currentMass = 220 			-- default mass
+	lander.currentAction = 0			-- used by AI
+	lander.measureNow = false
+	
 	-- mass
 	lander.mass = {}
 	-- base mass of lander
