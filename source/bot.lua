@@ -52,7 +52,6 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 	return realdist, closestbase
 end
 
-
 local function GetCurrentState(lander)
     currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
     currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)

@@ -23,6 +23,15 @@ function AI.initialise()
 	
 end
 
-
+function AI.update(dt)
+    if Fun.CurrentScreenName() == "World" then
+        for k, lander in pairs(LANDERS) do
+            if lander.isAI then
+                -- GetCurrentState(lander)
+                -- DetermineAction(lander, dt)
+            end
+        end
+    end
+end
 
 return AI

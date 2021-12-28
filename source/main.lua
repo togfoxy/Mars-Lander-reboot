@@ -313,7 +313,6 @@ function love.load()
 	Slab.SetINIStatePath(nil)
 	Slab.Initialize()
 	
-	AI.initialise()
 end
 
 function love.draw()
@@ -388,5 +387,6 @@ function love.update(dt)
 	EnetHandler.update(dt)
 	LovelyToasts.update(dt)
 	Bot.update(dt)
+	AI.update(dt)
 	Aspect.update()
 end
