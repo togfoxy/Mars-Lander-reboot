@@ -10,11 +10,13 @@ local predictedYgroundValue		-- the ground y value at the predicted point
 local toohigh, toolow
 local tooslow, toofast
 local tooleft, tooright
+local onground
 local closestbase       		-- object
 local lookahead = 240			-- how far to look ahead
 local ygap1, vxgap1				-- how far the predicted location is off-target
 local ygap2, vxgap2
 local nextaction = 0
+local index1, index2
 
 function AI.printQTable(qt)
 	-- prints the provided qtable out to the console with a small amount of formatting
@@ -28,6 +30,38 @@ function AI.printQTable(qt)
 		end
 	end
 	print("***************************************")
+end
+
+local function setTooHighTooLow(lander)
+	if toohigh == nil then
+	    if predictedy < perfecty * 0.9 then
+	        toohigh = true
+	        toolow = false
+	    elseif predictedy > perfectvx * 1.1 then
+	        toohigh = false
+	        toolow = true
+		else
+			toohigh = false
+			toolow = false
+	    end
+	    if lander.vx < perfectvx * 0.9 then
+	        tooslow = true
+	        toofast = false
+	    elseif lander.vx > perfectvx * 1.1 then
+	        tooslow = false
+	        toofast = true
+		else
+			tooslow = false
+			toofast = false
+	    end
+		if currentDistanceToBase < 0 then
+			tooleft = true
+			tooright = false
+		else
+			tooleft = false
+			tooright = true
+		end
+	end
 end
 
 local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
@@ -62,7 +96,8 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 end
 
 local function GetCurrentState(lander)
-    currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
+	if lander.onGround then onground = true end
+
     currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
 
 	-- predictedx is the x value the lander is predicted to be at based on current trajectory
@@ -76,7 +111,7 @@ local function GetCurrentState(lander)
 	-- the AI will sometimes target a base that is well behind it. Guard against that.
 	if currentDistanceToBase > 1000 then
 		-- erase the fuel from the far away base and search again
-		closestbase[lander.uuid].fuelLeft = 0
+		closestbase.fuelLeft = 0
 		currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 	end
 
@@ -110,42 +145,65 @@ local function GetCurrentState(lander)
 
     perfectvx = currentDistanceToBase / -120        -- some constant that determines best vx
 
-    if predictedy < perfecty * 0.9 then
-        toohigh = true
-        toolow = false
-    elseif predictedy > perfectvx * 1.1 then
-        toohigh = false
-        toolow = true
-	else
-		toohigh = false
-		toolow = false
-    end
-    if lander.vx < perfectvx * 0.9 then
-        tooslow = true
-        toofast = false
-    elseif lander.vx > perfectvx * 1.1 then
-        tooslow = false
-        toofast = true
-	else
-		tooslow = false
-		toofast = false
-    end
-	if currentDistanceToBase < 0 then
-		tooleft = true
-		tooright = false
-	else
-		tooleft = false
-		tooright = true
-	end
-
-	-- print(tooleft, tooright, toolow, toohigh, tooslow, toofast, predictedy, perfecty)
-
 	-- return the two key values
 	yvariable = perfecty - predictedy		-- this is the y gap
 	vxvariable = lander.vx - perfectvx		-- this is the vx gap
 
 	-- print(yvariable ,vxvariable)
 	return yvariable ,vxvariable
+end
+
+local function constructQTableIndex(lander)
+	local ind1, ind2
+	ind1 = ""
+	if onground then
+		ind1 = "onground"
+	end
+	if tooleft then
+		ind1 = ind1 .. "tooleft"
+	else
+		ind1 = ind1 .. "tooright"
+	end
+	if not onground then
+		if toohigh then
+			ind1 = ind1 .. "toohigh"
+		elseif toolow then
+			ind1 = ind1 .. "toolow"
+		else
+			ind1 = ind1 .. "rightalt"
+		end
+		if tooslow then
+			ind1 = ind1 .. "tooslow"
+		elseif toofast then
+			ind1 = ind1 .. "toofast"
+		else
+			ind1 = ind1 .. "rightspeed"
+		end
+	end
+
+	-- create index2
+	if lander.currentAction == Enum.AIActionWait then
+		ind2 = "Wait"
+	elseif lander.currentAction == Enum.AIActionThrust180 then
+		ind2 = "Thrust180"
+	elseif lander.currentAction == Enum.AIActionThrust210 then
+		ind2 = "Thrust210"
+	elseif lander.currentAction == Enum.AIActionThrust240 then
+		ind2 = "Thrust240"
+	elseif lander.currentAction == Enum.AIActionThrust270 then
+		ind2 = "Thrust270"
+	elseif lander.currentAction == Enum.AIActionThrust300 then
+		ind2 = "Thrust300"
+	elseif lander.currentAction == Enum.AIActionThrust330 then
+		ind2 = "Thrust330"
+	elseif lander.currentAction == Enum.AIActionThrust360 then
+		ind2 = "Thrust360"
+	else
+		-- has no current action
+		ind2 = nil
+	end
+
+	return ind1, ind2
 end
 
 local function DetermineAction(lander, dt)
@@ -168,32 +226,15 @@ local function DetermineAction(lander, dt)
 		-- lander is not on base or not refueling so contue to determine action
 		-- check if lander already has an action
 		if lander.currentAction == Enum.AIActionNothing then
+			-- lander chooses to explore or exploit
 			if love.math.random(1,100) <= explorerate then
 				-- explorative. Choose any random action
 				lander.currentAction = love.math.random(1, Enum.AIActionNumbers)
 			else
-				-- choose best action from qtable
-				-- construct index1
-				-- create index1
-				if tooleft then
-					index1 = "tooleft"
-				else
-					index1 = "tooright"
-				end
-				if toohigh then
-					index1 = index1 .. "toohigh"
-				elseif toolow then
-					index1 = index1 .. "toolow"
-				else
-					index1 = index1 .. "rightalt"
-				end
-				if tooslow then
-					index1 = index1 .. "tooslow"
-				elseif toofast then
-					index1 = index1 .. "toofast"
-				else
-					index1 = index1 .. "rightspeed"
-				end
+				-- exploit the qtable
+				-- construct index
+				-- index2 is set here and then overwritten below
+				index1, index2 = constructQTableIndex(lander)
 
 				-- scan all actions for index1 and choose the highest value
 				local largestvalue = -999
@@ -204,36 +245,19 @@ local function DetermineAction(lander, dt)
 							largestValue = v
 						end
 					end
-
-					-- index2 is a string value. Determine what it means
-					-- print("best action is: " .. index2)
-
-					if index2 == "Wait" then
-						lander.currentAction = Enum.AIActionWait
-					elseif index2 == "Thrust180" then
-						lander.currentAction = Enum.AIActionThrust180
-					elseif index2 == "Thrust210" then
-						lander.currentAction = Enum.AIActionThrust210
-					elseif index2 == "Thrust240" then
-						lander.currentAction = Enum.AIActionThrust240
-					elseif index2 == "Thrust270" then
-						lander.currentAction = Enum.AIActionThrust270
-					elseif index2 == "Thrust300" then
-						lander.currentAction = Enum.AIActionThrust300
-					elseif index2 == "Thrust330" then
-						lander.currentAction = Enum.AIActionThrust330
-					elseif index2 == "Thrust360" then
-						lander.currentAction = Enum.AIActionThrust360
-					else
-						print(index2)
-						error()
-					end
+				end
+				-- check if an action is actually chosen from the qtable
+				if index2 == nil then
+					-- explorative. Choose any random action
+					lander.currentAction = love.math.random(1, Enum.AIActionNumbers)
+					index1, index2 = constructQTableIndex(lander)		--! redundant?
 				end
 			end
 		end
 	else
 		-- lander is on base or refueling or not needing a decision
 	end
+	index1, index2 = constructQTableIndex(lander)
 	-- print(nextaction)
 end
 
@@ -288,53 +312,15 @@ local function ExecuteAction(lander, dt)
 end
 
 local function RewardAction(lander, dt)
-	local index1, index2
+	-- local index1, index2
 	local rewardvalue = 0
 
-
-
 	-- only take measurements when the engine is actually on and impacting speed/direction
-	if lander.currentAction ~= Enum.AIActionNothing and lander.engineOn then
+	if lander.currentAction ~= Enum.AIActionNothing and lander.engineOn and index2 ~= nil then
 		-- update the Qtable
 		-- create index1
-		if tooleft then
-			index1 = "tooleft"
-		else
-			index1 = "tooright"
-		end
-		if toohigh then
-			index1 = index1 .. "toohigh"
-		elseif toolow then
-			index1 = index1 .. "toolow"
-		else
-			index1 = index1 .. "rightalt"
-		end
-		if tooslow then
-			index1 = index1 .. "tooslow"
-		elseif toofast then
-			index1 = index1 .. "toofast"
-		else
-			index1 = index1 .. "rightspeed"
-		end
 
-		-- create index2
-		if lander.currentAction == Enum.AIActionWait then
-			index2 = "Wait"
-		elseif lander.currentAction == Enum.AIActionThrust180 then
-			index2 = "Thrust180"
-		elseif lander.currentAction == Enum.AIActionThrust210 then
-			index2 = "Thrust210"
-		elseif lander.currentAction == Enum.AIActionThrust240 then
-			index2 = "Thrust240"
-		elseif lander.currentAction == Enum.AIActionThrust270 then
-			index2 = "Thrust270"
-		elseif lander.currentAction == Enum.AIActionThrust300 then
-			index2 = "Thrust300"
-		elseif lander.currentAction == Enum.AIActionThrust330 then
-			index2 = "Thrust330"
-		elseif lander.currentAction == Enum.AIActionThrust360 then
-			index2 = "Thrust360"
-		end
+		-- index1,index2 = constructQTableIndex(lander)
 
 		-- larger is better
 		rewardvalue = (math.abs(ygap1) - math.abs(ygap2)) + ((math.abs(vxgap1) - math.abs(vxgap2)) * 2000)
@@ -360,16 +346,27 @@ local function RewardAction(lander, dt)
 			qtable[index1][index2] = (qtable[index1][index2] + rewardvalue) / 2
 		end
 
-		-- clear a negative action
-		if rewardvalue < 0 then lander.currentAction = Enum.AIActionNothing end
+		-- clear a action that has a really low reward
+		if rewardvalue < 0 then
+			lander.currentAction = Enum.AIActionNothing
+		end
 	end
 
 	-- print(index1, index2, rewardvalue, nil, Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
 
+	-- clear these for the next pass
 	ygap1 = nil
 	ygap2 = nil
 	vxgap1 = nil
 	vxgap2 = nil
+
+	toohigh = nil
+	toolow = nil
+	tooslow = nil
+	toofast = nil
+	tooleft = nil
+	tooright = nil
+	onground = nil
 end
 
 function AI.update(dt)
@@ -378,11 +375,13 @@ function AI.update(dt)
             if lander.isAI then
 				if ygap1 == nil then
 					ygap1, vxgap1 = GetCurrentState(lander)
+					setTooHighTooLow(lander)		-- set this on the first pass and then compare it on the 2nd pass
 				else
 					ygap2, vxgap2 = GetCurrentState(lander)
 				end
 
                 DetermineAction(lander, dt)
+				assert(index1 ~= nil)
 				ExecuteAction(lander, dt)
 				if ygap2 ~= nil then
 					RewardAction(lander, dt)
@@ -390,8 +389,6 @@ function AI.update(dt)
             end
         end
     end
-
-
 end
 
 return AI
