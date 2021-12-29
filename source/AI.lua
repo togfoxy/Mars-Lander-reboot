@@ -1,5 +1,7 @@
 local AI = {}
 
+-- high score = 48,000
+
 local currentAltitude
 local currentIsOnBase
 predictedx = 0   -- this is the lookahead ability
@@ -65,7 +67,7 @@ local function setTooHighTooLow(lander)
 	end
 end
 
-local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
+local function GetDistanceToFueledBase(uuid, xvalue, intBaseType)
 	-- uuid is the lander ID. This is needed as each lander has their own instance of fuel bases
 	-- returns two values: the distance to the closest base with fuel, and the object/table item for that base
 	-- note: if distance is a negative value then the Lander has not yet passed the base
@@ -76,6 +78,10 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 
 	for k,v in pairs(OBJECTS) do
 		if v.objecttype == intBaseType then
+	-- print(Inspect(v))
+	-- print(uuid)
+			if v.fuelLeft[uuid] == nil then v.fuelLeft[uuid] = Enum.baseMaxFuel end
+
 			if (v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1) then
 			 	if (v.hasLanded[uuid] == nil or v.hasLanded[uuid] == false) then
 					-- the + bit is an offset to calculate the landing pad and not the image
@@ -88,6 +94,7 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 			end
 		end
 	end
+	-- print("~~~")
 
 	-- now we have the closest base, work out the distance to the landing pad for that base
 	if closestbase.x ~= nil then
@@ -106,11 +113,16 @@ local function GetCurrentState(lander)
 	if predictedx < 0 then predictedx = 0 end
     -- negative value means not yet past the base
     currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
+	if currentDistanceToBase == nil then
+		print(predictedx, #GROUND)
+		error("Error. Check debug")
+	end
+
 
 	-- the AI will sometimes target a base that is well behind it. Guard against that.
 	if currentDistanceToBase > 1000 then
 		-- erase the fuel from the far away base and search again
-		closestbase.fuelLeft = 0
+		closestbase.fuelLeft[lander.uuid] = 0
 		currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 	end
 
@@ -149,7 +161,7 @@ local function GetCurrentState(lander)
     if perfecty < SCREEN_HEIGHT / 3 then perfecty = SCREEN_HEIGHT / 3 end
 
     perfectvx = currentDistanceToBase / -120        -- some constant that determines best vx
-print(currentDistanceToBase, perfectvx)
+	-- print(currentDistanceToBase, perfectvx)
 
 	-- return the two key values
 	yvariable = perfecty - predictedy		-- this is the y gap
@@ -330,7 +342,7 @@ local function RewardAction(lander, dt)
 		-- larger is better
 		rewardvalue = (math.abs(ygap1) - math.abs(ygap2)) + ((math.abs(vxgap1) - math.abs(vxgap2)) * 2000)
 
-	-- print(index1, index2, Cf.round(rewardvalue,2), Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
+	print(index1, index2, Cf.round(rewardvalue,2), Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
 
 		-- assign rewardvalue to the qtable, creating the element if necessary
 		if qtable[index1] == nil then

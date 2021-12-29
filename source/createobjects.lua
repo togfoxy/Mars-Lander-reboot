@@ -8,7 +8,7 @@ function createobjects.CreateObject(intType, intXValue)
 	mybase.x = intXValue			-- where on the map this object is positioned.
 	mybase.objecttype = intType		-- 2 = a fuel base
 	mybase.totalFuel = 0			-- used by the player and also drives the graphics/images
-	mybase.active = true
+	mybase.active = true			-- used by player only
 	mybase.paid = false				-- set true when lander lands and pays player. Ensures bases only pay once
 	mybase.fuelLeft = {}			-- this is to track the fuel used by bots and AI (not the player)
 	mybase.hasLanded = {}			-- tracks which lander has landed on each base

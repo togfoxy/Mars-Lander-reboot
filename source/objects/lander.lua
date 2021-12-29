@@ -663,7 +663,11 @@ function Lander.draw()
 			if landerId == 1 then
 				love.graphics.setColor(1,1,1,1)
 			else
-				love.graphics.setColor(1,1,1,0.5)
+				if lander.fuel > 2 then
+					love.graphics.setColor(1,1,1,0.5)
+				else
+					love.graphics.setColor(1, 0, 0, 0.5)
+				end
 			end
 
 			-- draw parachute before drawing the lander
