@@ -460,7 +460,7 @@ function Lander.create(name)
 	lander.isAI = false
 	lander.isPlayer = false				-- can be a bot, ai, player or opponent (human)
 	lander.currentAction = 0			-- used by AI
-	lander.waitTimer = 0		-- used by AI
+	lander.currentActionTimer = 0		-- used by AI
 
 	if GAME_CONFIG.easyMode then
 		lander.money = 9999
@@ -510,7 +510,7 @@ function Lander.reset(lander)
 	lander.score = lander.x - ORIGIN_X
 	lander.currentMass = 220 			-- default mass
 	lander.currentAction = 0			-- used by AI
-	lander.waitTimer = 0		-- used by AI
+	lander.currentActionTimer = 0		-- used by AI
 
 	-- mass
 	lander.mass = {}

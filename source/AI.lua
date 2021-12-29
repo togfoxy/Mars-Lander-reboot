@@ -5,6 +5,7 @@ local currentIsOnBase
 predictedx = 0   -- this is the lookahead ability
 predictedy = 0   -- this is the lookahead ability
 perfecty = 0     -- the y value that is just right
+perfectvx = 0
 local currentDistanceToBase
 local predictedYgroundValue		-- the ground y value at the predicted point
 local toohigh, toolow
@@ -75,12 +76,14 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 
 	for k,v in pairs(OBJECTS) do
 		if v.objecttype == intBaseType then
-			if v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1 then
-				-- the + bit is an offset to calculate the landing pad and not the image
-				absdist = math.abs(xvalue - (v.x + 85))
-				if closestdistance == -1 or absdist <= closestdistance then
-					closestdistance = absdist
-					closestbase = v
+			if (v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1) then
+			 	if (v.hasLanded[uuid] == nil or v.hasLanded[uuid] == false) then
+					-- the + bit is an offset to calculate the landing pad and not the image
+					absdist = math.abs(xvalue - (v.x + 85))
+					if closestdistance == -1 or absdist <= closestdistance then
+						closestdistance = absdist
+						closestbase = v
+					end
 				end
 			end
 		end
@@ -91,15 +94,11 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 		-- the + bit is an offset to calculate the landing pad and not the image
 		realdist = xvalue - (closestbase.x + 85)
 	end
-
 	return realdist, closestbase
 end
 
 local function GetCurrentState(lander)
 	if lander.onGround then onground = true end
-
-    currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
-
 	-- predictedx is the x value the lander is predicted to be at based on current trajectory
 	-- predictedy is the y value the lander is predicted to be at based on current trajectory
 	-- predictedYgroundValue is the y value for the terrain when looking ahead
@@ -121,6 +120,12 @@ local function GetCurrentState(lander)
         Terrain.generate(SCREEN_WIDTH * 4)
         currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
     end
+
+	currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
+	if currentIsOnBase then
+		if closestbase[lander.uuid] == nil then closestbase[lander.uuid] = {} end
+		closestbase[lander.uuid].hasLanded = true
+	end
 
 	-- ensure this block is below the above WHILE loop
     predictedy = lander.y + (lander.vy * lookahead)
@@ -144,6 +149,7 @@ local function GetCurrentState(lander)
     if perfecty < SCREEN_HEIGHT / 3 then perfecty = SCREEN_HEIGHT / 3 end
 
     perfectvx = currentDistanceToBase / -120        -- some constant that determines best vx
+print(currentDistanceToBase, perfectvx)
 
 	-- return the two key values
 	yvariable = perfecty - predictedy		-- this is the y gap
@@ -220,7 +226,7 @@ local function DetermineAction(lander, dt)
     -- if tank is full
     if lander.fuel >= lander.fuelCapacity then takeaction = true end
     -- if not near a base
-    if abscurrentDistanceToBase > 200 then takeaction = true end
+    if (abscurrentDistanceToBase > 200 and not currentIsOnBase) then takeaction = true end
 
 	if takeaction then
 		-- lander is not on base or not refueling so contue to determine action
@@ -250,7 +256,6 @@ local function DetermineAction(lander, dt)
 				if index2 == nil then
 					-- explorative. Choose any random action
 					lander.currentAction = love.math.random(1, Enum.AIActionNumbers)
-					index1, index2 = constructQTableIndex(lander)		--! redundant?
 				end
 			end
 		end
@@ -265,9 +270,9 @@ local function ExecuteAction(lander, dt)
 	if lander.currentAction ~= Enum.AIActionNothing then
 		if lander.currentAction == Enum.AIActionWait then
 			-- lander will wait for a specified time before choosing a new action
-			lander.waitTimer = lander.waitTimer + dt
-			if lander.waitTimer > Enum.AIWaitTimerThreshold then
-				lander.waitTimer = 0
+			lander.currentActionTimer = lander.currentActionTimer + dt
+			if lander.currentActionTimer > Enum.AIWaitTimerThreshold then
+				lander.currentActionTimer = 0
 				lander.currentAction = Enum.AIActionNothing
 			end
 		elseif lander.currentAction == Enum.AIActionThrust180 then
@@ -308,6 +313,9 @@ local function ExecuteAction(lander, dt)
 		else
 			error("Something impossible happened.")
 		end
+
+		-- all actions expire after a time - even good actions
+		lander.currentActionTimer = lander.currentActionTimer + dt
 	end
 end
 
@@ -318,24 +326,13 @@ local function RewardAction(lander, dt)
 	-- only take measurements when the engine is actually on and impacting speed/direction
 	if lander.currentAction ~= Enum.AIActionNothing and lander.engineOn and index2 ~= nil then
 		-- update the Qtable
-		-- create index1
-
-		-- index1,index2 = constructQTableIndex(lander)
 
 		-- larger is better
 		rewardvalue = (math.abs(ygap1) - math.abs(ygap2)) + ((math.abs(vxgap1) - math.abs(vxgap2)) * 2000)
 
-		print(index1, index2, rewardvalue, Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
+	-- print(index1, index2, Cf.round(rewardvalue,2), Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
 
-		-- if rewardvalue < -550 or rewardvalue > 700 then
-		-- 	print()
-		-- 	AI.printQTable(qtable)
-		-- 	error()
-		-- end
-
-		-- print(tooleft, tooright, toolow, toohigh, tooslow, toofast, predictedy, perfecty, rewardvalue)
-		-- print(ygap1, ygap2)
-
+		-- assign rewardvalue to the qtable, creating the element if necessary
 		if qtable[index1] == nil then
 			qtable[index1] = {}
 		end
@@ -347,12 +344,17 @@ local function RewardAction(lander, dt)
 		end
 
 		-- clear a action that has a really low reward
-		if rewardvalue < 0 then
+		if rewardvalue < -5 then
 			lander.currentAction = Enum.AIActionNothing
 		end
-	end
 
-	-- print(index1, index2, rewardvalue, nil, Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
+		if lander.currentActionTimer > Enum.AIWaitTimerThreshold then
+			lander.currentActionTimer = 0
+			if rewardvalue < 10 then
+				lander.currentAction = Enum.AIActionNothing
+			end
+		end
+	end
 
 	-- clear these for the next pass
 	ygap1 = nil
@@ -379,9 +381,7 @@ function AI.update(dt)
 				else
 					ygap2, vxgap2 = GetCurrentState(lander)
 				end
-
                 DetermineAction(lander, dt)
-				assert(index1 ~= nil)
 				ExecuteAction(lander, dt)
 				if ygap2 ~= nil then
 					RewardAction(lander, dt)
