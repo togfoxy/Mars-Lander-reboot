@@ -25,7 +25,6 @@ function Bot.GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 	local closestdistance = -1
 	local closestbase = {}
 	local absdist
-	local dist
 	local realdist
 
 	for k,v in pairs(OBJECTS) do
@@ -33,8 +32,6 @@ function Bot.GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 			if v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1 then
 				-- the + bit is an offset to calculate the landing pad and not the image
 				absdist = math.abs(xvalue - (v.x + 85))
-				-- same but without the math.abs)
-				dist = (xvalue - (v.x + 85))
 				if closestdistance == -1 or absdist <= closestdistance then
 					closestdistance = absdist
 					closestbase = v
@@ -66,12 +63,12 @@ local function GetCurrentState(lander)
     while closestbase.x == nil or predictedx > #GROUND do
         Terrain.generate(SCREEN_WIDTH * 4)
         currentDistanceToBase, closestbase = Bot.GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
-print("Adding more terrain")
+print("Adding more terrain for bot")
     end
 
 	-- ensure this block is below the above WHILE loop
     predictedy = lander.y + (lander.vy * lookahead)
-    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]	
+    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
 
     if predictedYgroundValue == nil then
         print(#GROUND, predictedx, predictedy, predictedYgroundValue)
