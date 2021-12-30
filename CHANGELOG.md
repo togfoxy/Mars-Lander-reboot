@@ -4,7 +4,22 @@ All notable changes to this project should be documented in this file.
 
 The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.0.0/)
 
-## unreleased
+## Unreleased (v1.04)
+
+### Added
+
+### Changed
+- parachute now auto-deploys
+
+### Fixed
+- the end game text message is now correct
+
+## v1.03
+
+### Added
+- an AI lander to fly against
+
+## v1.02
 
 ### Added
 - a new 'guidance unit' upgrade
