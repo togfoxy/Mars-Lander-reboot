@@ -10,7 +10,7 @@ HUD.font = love.graphics.newFont(20)
 
 -- TODO: Create variables in a init or create function
 -- Fuel indicator elements
-HUD.fuel = {x = 20, y = 20, width = SCREEN_WIDTH - 40, height = 50, cornerSize = 15}
+HUD.fuel = {x = 20, y = 40, width = SCREEN_WIDTH - 40, height = 50, cornerSize = 15}
 HUD.fuel.middle = HUD.fuel.x + math.floor(HUD.fuel.width / 2)
 HUD.fuel.bottom = HUD.fuel.y + HUD.fuel.height
 HUD.fuel.text = {image=love.graphics.newText(HUD.font, "FUEL")}
@@ -76,7 +76,7 @@ end
 
 local function drawMoney(lander)
 	Assets.setFont("font20")
-	love.graphics.print("$" .. lander.money, SCREEN_WIDTH - 100, 75)
+	love.graphics.print("$" .. lander.money, SCREEN_WIDTH - 100, 95)
 end
 
 local function newdrawRangefinder(lander)
@@ -169,24 +169,24 @@ local function newdrawShopMenu()
 end
 
 local function drawGameOver()
-    Assets.setFont("font16")
+    Assets.setFont("font18")
     local text = "You are out of fuel. Game over. Press ENTER to reset your lander \n"
 	text = text .. "              or R to reset all landers (multiplayer/bots)."
 
 	-- try to get centre of screen
-    local x = (SCREEN_WIDTH / 2) - 230
+    local x = (SCREEN_WIDTH / 2) - 260
     local y = SCREEN_HEIGHT * 0.33
     love.graphics.print(text, x, y)
 end
 
 local function drawScore()
 	-- score is simply the amount of forward distance travelled (lander.score)
-	local lineLength = 150	-- printf will wrap after this point
+	local lineLength = 200	-- printf will wrap after this point
 	local x = SCREEN_WIDTH - 15 - lineLength	-- the 15 is an asthetic margin from the right edge
 	local y = SCREEN_HEIGHT * 0.20
 	local alignment	= "right"
 
-	Assets.setFont("font14")
+	Assets.setFont("font16")
 	for _,lander in pairs(LANDERS) do
 		-- guard against connecting mplayer clients not having complete data
 		if lander.score ~= nil then
@@ -198,9 +198,9 @@ local function drawScore()
 		end
 	end
 
-	-- print high score
+	-- draw high score
 	local highscore = Cf.strFormatThousand(Cf.round(GAME_SETTINGS.HighScore))
-	love.graphics.print("High Score: " .. highscore .. " (" .. GAME_SETTINGS.HighScoreName .. ")", (SCREEN_WIDTH / 2) - 75, 90)
+	love.graphics.print("High Score: " .. highscore .. " (" .. GAME_SETTINGS.HighScoreName .. ")", (SCREEN_WIDTH / 2) - 75, 110)
 end
 
 local function drawDebug()
@@ -228,7 +228,7 @@ end
 local function drawPortInformation()
 	if IS_A_HOST then
 		love.graphics.setColor(1,1,1,0.50)
-		Assets.setFont("font14")
+		Assets.setFont("font16")
 		local txt = "Hosting on port: " .. HOST_IP_ADDRESS .. ":" .. GAME_SETTINGS.hostPort
 		love.graphics.printf(txt, 0, 5, SCREEN_WIDTH, "center")
 		love.graphics.setColor(1, 1, 1, 1)

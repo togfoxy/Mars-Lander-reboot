@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "1.03"
+GAME_VERSION = "1.04"
 
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 

@@ -678,7 +678,7 @@ function Lander.draw()
 				lander.rightEngineOn = false
 			end
 
-			-- draw label
+			-- draw player label
 			love.graphics.setNewFont(10)
 			love.graphics.print(lander.name, x + 17, y - 15)
 			love.graphics.setColor(1,1,1,1)
