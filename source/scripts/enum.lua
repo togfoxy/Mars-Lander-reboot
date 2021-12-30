@@ -24,6 +24,21 @@ return {
 	moduleRangefinder = 3,
 	moduleSideThrusters = 4,
 	moduleParachute = 5,
-    moduleGuidance = 6
+    moduleGuidance = 6,
+
+	AIActionNothing = 0,
+	AIActionWait = 1,
+	AIActionThrust180 = 2,
+	AIActionThrust210 = 3,
+	AIActionThrust240 = 4,
+	AIActionThrust270 = 5,
+	AIActionThrust300 = 6,
+	AIActionThrust330 = 7,
+	AIActionThrust360 = 8,
+
+	AIActionNumbers = 8,		-- this is the maximumn number of options. Set to the last AIAction enum value
+
+    AIWaitTimerThreshold = 1        -- how frequently to measure AI actions
+
 
 }

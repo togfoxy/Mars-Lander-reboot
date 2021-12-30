@@ -75,7 +75,6 @@ function Menus.DrawMainMenu()
 			Fun.AddScreen("Settings")
 		end
 
-
 		Slab.SetLayoutColumn(3)
 
 		Slab.NewLine()
@@ -335,13 +334,15 @@ function Menus.DrawSettingsMenu()
 	        GAME_CONFIG.botOn = not GAME_CONFIG.botOn
 	    end
 
+		if Slab.CheckBox(GAME_CONFIG.AIOn, "Fly with a AI") then
+	        GAME_CONFIG.AIOn = not GAME_CONFIG.AIOn
+	    end
+
 		Slab.EndLayout() -- layout-settings
 
 		-- this displays the OK button at the bottom
 		Slab.BeginLayout('layout-settings2',{AlignX = "center"})
 
-			Slab.NewLine()
-			Slab.NewLine()
 			Slab.NewLine()
 			Slab.NewLine()
 			Slab.NewLine()
@@ -352,7 +353,7 @@ function Menus.DrawSettingsMenu()
 			if Slab.Button("OK") then
 				-- return to the previous game state
 
-				Fun.processBots()	-- add/remove a bot depending on botOn value
+				Fun.processBotsandAI()	-- add/remove a bot depending on botOn value
 				Fun.configureModules()
 				Fun.RemoveScreen()
 			end

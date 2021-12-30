@@ -11,6 +11,7 @@ local function setDefaultGameConfigs()
 	GAME_CONFIG.music = true
 	GAME_CONFIG.allowGuidance = true
 	GAME_CONFIG.botOn = true
+	GAME_CONFIG.AIOn = true
 end
 
 function functions.configureModules()
@@ -111,14 +112,17 @@ function functions.SaveGameSettings()
 	local success, message
 	local savedir = love.filesystem.getSource()
 
--- print(Inspect(GAME_SETTINGS))
-
     savefile = savedir .. "/savedata/" .. "settings.dat"
     serialisedString = Bitser.dumps(GAME_SETTINGS)
+    success, message = Nativefs.write(savefile, serialisedString )
+
+	savefile = savedir .. "/savedata/" .. "qtable.dat"
+    serialisedString = Bitser.dumps(qtable)
     success, message = Nativefs.write(savefile, serialisedString )
 end
 
 function functions.LoadGameSettings()
+	-- is loaded during love.load
 
     local savedir = love.filesystem.getSource()
     love.filesystem.setIdentity( savedir )
@@ -129,9 +133,16 @@ function functions.LoadGameSettings()
     contents, _ = Nativefs.read(savefile)
 	local success
     success, GAME_SETTINGS = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
-
 	if success == false then
 		GAME_SETTINGS = {}
+	end
+
+	savefile = savedir .. "/savedata/" .. "qtable.dat"
+    contents, _ = Nativefs.read(savefile)
+	local success
+    success, qtable = pcall(Bitser.loads, contents)		--! should do pcall on all the "load" functions
+	if success == false then
+		qtable = {}
 	end
 
 	--If a player doesn't have 	-- a settings.dat already then all the values in GAME_SETTINGS table are
@@ -216,6 +227,14 @@ function functions.LoadGame()
 		error = true
 	end
 
+	savefile = savedir .. "/savedata/" .. "qtable.dat"
+	if Nativefs.getInfo(savefile) then
+	    contents, size = Nativefs.read(savefile)
+	    qtable = bitser.loads(contents)
+	else
+		error = true
+	end
+
 	if error then
 		-- a file is missing, so display a popup on a new game
 		Fun.ResetGame()
@@ -287,10 +306,10 @@ function functions.ResetGame()
 		LANDERS[1].isPlayer = true
 		-- capture the 'normal' mass of the lander into a global variable
 		LANDERS[1].currentMass = Lander.getMass(LANDERS[1])
-		
+
 	end
 
-	Fun.processBots()
+	Fun.processBotsandAI()
 
 end
 
@@ -343,8 +362,8 @@ function functions.getAltitude(lander)
 	return groundYValue - landerYValue
 end
 
-function functions.processBots()
-	-- makes sure bots are on or off according to global setting
+function functions.processBotsandAI()
+	-- makes sure bots and AI are on or off according to global setting
 	if GAME_CONFIG.botOn then
 		-- check if bot already exists
 		local botexists = false
@@ -363,6 +382,29 @@ function functions.processBots()
 		-- ensure all bots are destroyed
 		for k,lander in pairs(LANDERS) do
 			if lander.isBot then
+				table.remove(LANDERS, k)
+			end
+		end
+	end
+
+	if GAME_CONFIG.AIOn then
+		-- check if AI already exists
+		local AIexists = false
+		for k,lander in pairs(LANDERS) do
+			if lander.isAI then AIexists = true end
+		end
+		if AIexists then
+			-- AI is on and AI exists. Do nothing.
+		else
+			local newLander = Lander.create()
+			newLander.isAI = true
+			newLander.name = "AI"
+			table.insert(LANDERS, newLander)
+		end
+	else
+		-- ensure all AI are destroyed
+		for k,lander in pairs(LANDERS) do
+			if lander.isAI then
 				table.remove(LANDERS, k)
 			end
 		end

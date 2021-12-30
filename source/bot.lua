@@ -15,7 +15,7 @@ local tooleft
 local tooright
 local tooslow
 local toofast
-local closestbase       -- object
+local closestbase       	-- object
 local lookahead = 240		-- how far to look ahead
 
 local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
@@ -25,19 +25,22 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 	local closestdistance = -1
 	local closestbase = {}
 	local absdist
-	local dist
 	local realdist
 
 	for k,v in pairs(OBJECTS) do
 		if v.objecttype == intBaseType then
-			if v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1 then
-				-- the + bit is an offset to calculate the landing pad and not the image
-				absdist = math.abs(xvalue - (v.x + 85))
-				-- same but without the math.abs)
-				dist = (xvalue - (v.x + 85))
-				if closestdistance == -1 or absdist <= closestdistance then
-					closestdistance = absdist
-					closestbase = v
+	-- print(Inspect(v))
+	-- print(uuid)
+			if v.fuelLeft[uuid] == nil then v.fuelLeft[uuid] = Enum.baseMaxFuel end
+
+			if (v.fuelLeft[uuid] == nil or v.fuelLeft[uuid] > 1) then
+			 	if (v.hasLanded[uuid] == nil or v.hasLanded[uuid] == false) then
+					-- the + bit is an offset to calculate the landing pad and not the image
+					absdist = math.abs(xvalue - (v.x + 85))
+					if closestdistance == -1 or absdist <= closestdistance then
+						closestdistance = absdist
+						closestbase = v
+					end
 				end
 			end
 		end
@@ -52,27 +55,34 @@ local function GetDistanceToFueledBase(uuid,xvalue, intBaseType)
 	return realdist, closestbase
 end
 
-
 local function GetCurrentState(lander)
-    currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
-    currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
-
-	-- predictedx is the x value the lander is predicted to be at based on current trajectory
+    -- predictedx is the x value the lander is predicted to be at based on current trajectory
 	-- predictedy is the y value the lander is predicted to be at based on current trajectory
 	-- predictedYgroundValue is the y value for the terrain when looking ahead
     predictedx = lander.x + (lander.vx * lookahead)
+	if predictedx < 0 then predictedx = 0 end
+
+	currentAltitude = Fun.getAltitude(lander)       -- distance above ground level
+
     -- negative value means not yet past the base
     currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
-    -- searching for a base can outstrip the terrain so guard against that.
+
+	-- searching for a base can outstrip the terrain so guard against that.
     while closestbase.x == nil or predictedx > #GROUND do
         Terrain.generate(SCREEN_WIDTH * 4)
         currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
-print("Adding more terrain")
+		print("Adding more terrain for bot")
     end
+
+	currentIsOnBase = Lander.isOnLandingPad(lander, Enum.basetypeFuel)
+	if currentIsOnBase then
+		if closestbase[lander.uuid] == nil then closestbase[lander.uuid] = {} end
+		closestbase[lander.uuid].hasLanded = true
+	end
 
 	-- ensure this block is below the above WHILE loop
     predictedy = lander.y + (lander.vy * lookahead)
-    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]	
+    predictedYgroundValue = GROUND[Cf.round(predictedx,0)]
 
     if predictedYgroundValue == nil then
         print(#GROUND, predictedx, predictedy, predictedYgroundValue)
@@ -96,11 +106,9 @@ print("Adding more terrain")
     if predictedy < perfecty then
         toohigh = true
         toolow = false
---print("too high")
     else
         toohigh = false
         toolow = true
---print("too low")
     end
 
     if currentDistanceToBase < 0 then
@@ -114,18 +122,14 @@ print("Adding more terrain")
     if lander.vx < perfectvx then
         tooslow = true
         toofast = false
---print("too slow")
+
     else
         tooslow = false
         toofast = true
---print("too fast")
     end
-
---print("~~~")
-
 end
 
-local function turnTowardsAngle(lander, angle, dt)
+function Bot.turnTowardsAngle(lander, angle, dt)
     -- given an angle, turn left or right to meet it
     if lander.angle < angle then
         -- turn right/clockwise
@@ -144,33 +148,45 @@ end
 
 local function DetermineAction(lander, dt)
 
+	local thisbase		-- the base the lander is currently landed on
     local takeaction = false
-    local abscurrentDistanceToBase = (math.abs(currentDistanceToBase))
 
-    -- if not on base
-    if not currentIsOnBase then takeaction = true end
-    -- if tank is full
-    if lander.fuel >= lander.fuelCapacity then takeaction = true end
-    -- if not near a base
-    if abscurrentDistanceToBase > 200 then takeaction = true end
+	if not Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
+		takeaction = true
+		print("not on landing pad")
+	else
+		-- lander has landed
+		-- check for full tank
+		_, thisbase = Fun.GetDistanceToClosestBase(lander.x, Enum.basetypeFuel)
+		if lander.fuel >= (lander.fuelCapacity) then
+			thisbase.fuelLeft[lander.uuid] = 0	-- fudge. Drain the fuel so the bot moves on
+			takeaction = true
+			print("fuel is full")
+		end
+		-- check if base is out of fuel
+		if thisbase.fuelLeft[lander.uuid] <= 1 then
+			takeaction = true
+			print("base is empty")
+		end
+	end
 
     if takeaction then
         if toolow and tooslow then
             -- turn to 315
-            turnTowardsAngle(lander, 315, dt)
+            Bot.turnTowardsAngle(lander, 315, dt)
             Lander.doThrust(lander, dt)
         elseif toolow and toofast then
             -- turn to 235
-            turnTowardsAngle(lander, 235, dt)
+            Bot.turnTowardsAngle(lander, 235, dt)
             Lander.doThrust(lander, dt)
         elseif toohigh and toofast then
             -- turn left
-            turnTowardsAngle(lander, 180, dt)
+            Bot.turnTowardsAngle(lander, 180, dt)
             if lander.angle < 215 then
                 Lander.doThrust(lander, dt)
             end
         elseif toohigh and tooslow then
-            turnTowardsAngle(lander, 359, dt)
+            Bot.turnTowardsAngle(lander, 359, dt)
             if lander.angle > 345 then
                 Lander.doThrust(lander, dt)
             end
