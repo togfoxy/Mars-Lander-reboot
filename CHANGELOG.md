@@ -11,9 +11,11 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 ### Changed
 - parachute now auto-deploys
 - font sizes are now larger
+- removed unused DEBUG code
 
 ### Fixed
 - the end game text message is now correct
+- the game music now plays properly
 
 ## v1.03
 
