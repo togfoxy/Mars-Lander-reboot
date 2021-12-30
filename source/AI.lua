@@ -275,7 +275,7 @@ local function DetermineAction(lander, dt)
 		-- lander is on base or refueling or not needing a decision
 	end
 	index1, index2 = constructQTableIndex(lander)
-	-- print(nextaction)
+	-- print("Current action: " .. lander.currentAction .. ". Take action: " .. tostring(takeaction))
 end
 
 local function ExecuteAction(lander, dt)
@@ -342,7 +342,7 @@ local function RewardAction(lander, dt)
 		-- larger is better
 		rewardvalue = (math.abs(ygap1) - math.abs(ygap2)) + ((math.abs(vxgap1) - math.abs(vxgap2)) * 2000)
 
-	print(index1, index2, Cf.round(rewardvalue,2), Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
+-- print(index1, index2, Cf.round(rewardvalue,2), Cf.round(lander.angle,0), Cf.round(ygap1,4), Cf.round(ygap2,4), Cf.round(vxgap1,4), Cf.round(vxgap2,4))
 
 		-- assign rewardvalue to the qtable, creating the element if necessary
 		if qtable[index1] == nil then

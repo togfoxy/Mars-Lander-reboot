@@ -547,10 +547,11 @@ function Lander.getMass(lander)
     return result
 end
 
-function Lander.isOnLandingPad(lander, baseId)
+function Lander.isOnLandingPad(lander, basetype)
 	-- returns a true / false value
+	-- baseID is the type of base (fuel etc)
 
-    local baseDistance, _ = Fun.GetDistanceToClosestBase(lander.x, baseId)
+    local baseDistance, _ = Fun.GetDistanceToClosestBase(lander.x, basetype)
     if baseDistance >= -80 and baseDistance <= 40 and altitude(lander) < 22 then
         return true
     else
