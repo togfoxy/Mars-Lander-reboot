@@ -280,9 +280,7 @@ function HUD.draw()
 		newdrawShopMenu()
 	end
 
-	if DEBUG then
-		drawDebug()
-	end
+	drawDebug()
 end
 
 

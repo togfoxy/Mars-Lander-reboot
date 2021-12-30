@@ -12,9 +12,6 @@ love.window.setTitle("Mars Lander " .. GAME_VERSION)
 -- Directly release messages generated with e.g print for instant feedback
 io.stdout:setvbuf("no")
 
--- Do debug stuff like display info text etc
-DEBUG = true
-
 -- Global screen dimensions
 SCREEN_WIDTH = 1920
 SCREEN_HEIGHT = 1080
@@ -262,9 +259,6 @@ function love.load()
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = true,display = 1,resizable = true, borderless = false}
         love.window.setMode(SCREEN_WIDTH, SCREEN_HEIGHT, flags)
-        DEBUG = false
-
-
     else
 		-- display = monitor number (1 or 2)
 		local flags = {fullscreen = false,display = 1,resizable = true, borderless = false}
@@ -278,13 +272,6 @@ function love.load()
 
 	-- Load settings
 	Fun.LoadGameSettings()
-
-	-- Play music
-	-- true for "isLooping"
-	if GAME_CONFIG.music then
-		Assets.playSound("menuTheme", true)
-		Assets.getSound("menuTheme"):setVolume(.2)
-	end
 
 	-- Restore full screen setting
 	-- love.window.setFullscreen(GAME_SETTINGS.FullScreen)
@@ -306,6 +293,14 @@ function love.load()
 	Terrain.init()
 	NewModules.createModules()
 	Fun.LoadGameConfig()	-- this has to come after createModules because it modifies modules
+	
+	-- Play music
+	-- true for "isLooping"
+	-- must come after LoadGameConfig()
+	if GAME_CONFIG.music then
+		Assets.playSound("menuTheme", true)
+		Assets.getSound("menuTheme"):setVolume(.2)
+	end
 
 	Fun.ResetGame()
 
