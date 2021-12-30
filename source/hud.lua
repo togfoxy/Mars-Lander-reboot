@@ -170,10 +170,11 @@ end
 
 local function drawGameOver()
     Assets.setFont("font16")
-    local text = "You are out of fuel. Game over. Press R to reset"
+    local text = "You are out of fuel. Game over. Press ENTER to reset your lander \n"
+	text = text .. "              or R to reset all landers (multiplayer/bots)."
 
 	-- try to get centre of screen
-    local x = (SCREEN_WIDTH / 2) - 150
+    local x = (SCREEN_WIDTH / 2) - 230
     local y = SCREEN_HEIGHT * 0.33
     love.graphics.print(text, x, y)
 end

@@ -96,15 +96,11 @@ local function thrustLeft(lander, dt)
 		lander.rightEngineOn = true
 		lander.fuel = lander.fuel - forceX
 	end
-
-	-- if trying to side thrust and has parachute and descending and on the screen then ...
-	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleParachute)) and not landerHasFuelToThrust(lander, dt) then
-		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
-			-- parachutes allow left/right drifting even if no fuel and thrusters available
-			deployParachute(lander)
-			local forceX = 0.5 * dt
-			lander.vx = lander.vx - forceX
-		end
+	
+	-- parachutes allow minor left/right movement
+	if parachuteIsDeployed(lander) then
+		local forceX = 0.5 * dt
+		lander.vx = lander.vx - forceX
 	end
 end
 
@@ -116,14 +112,11 @@ local function thrustRight(lander, dt)
 		-- opposite engine is on
 		lander.leftEngineOn = true
 	end
-
-	-- if trying to side thrust and has parachute and descending and on the screen then ...
-	if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleParachute)) and not landerHasFuelToThrust(lander, dt) then
-		if lander.vy > 0 and lander.y > 15 then		-- 15 is enough to clear the fuel gauge
-			deployParachute(lander)
-			local forceX = 0.5 * dt
-			lander.vx = lander.vx + forceX
-		end
+	
+	-- parachutes allow minor left/right movement
+	if parachuteIsDeployed(lander) then
+		local forceX = 0.5 * dt
+		lander.vx = lander.vx + forceX
 	end
 end
 
@@ -140,13 +133,22 @@ local function moveShip(lander, dt)
 	if not lander.onGround then
 		-- apply gravity
 		lander.vy = lander.vy + (Enum.constGravity * dt)
+		
+		-- auto deploy parachute
+		-- if has parachute and descending and on the screen then ...
+		if Lander.hasUpgrade(lander, Fun.getModule(Enum.moduleParachute)) and not landerHasFuelToThrust(lander, dt) then
+			if lander.vy > 0 and lander.y > -25 then		-- 15 is enough to clear the fuel gauge
+				-- parachutes allow left/right drifting even if no fuel and thrusters available
+				deployParachute(lander)
+				-- local forceX = 0.5 * dt
+				-- lander.vx = lander.vx - forceX
+			end
+		end		
 
 		-- parachutes slow descent
 		if parachuteIsDeployed(lander) and lander.vy > 0.5 then
 			lander.vy = 0.5
 		end
-
--- print(lander.name, Cf.round(lander.vx,2), Cf.round(lander.vy,2), dt)
 
 		-- used to determine speed right before touchdown
 		LANDER_VY = lander.vy
@@ -603,51 +605,6 @@ function Lander.doThrust(lander, dt)
 	end
 end
 
-function Lander.update(dt)
-
-	for k, lander in pairs(LANDERS) do
-
-		-- need to ensure the player actions don't override bots and other players
-		--! probably don't want a FOR loop here
-		if k == 1 then
-			local keyDown = love.keyboard.isDown
-
-		    if keyDown("up") or keyDown("w") or keyDown("kp8") then
-				-- bot has it's own thrust routines
-				if not lander.isBot then Lander.doThrust(lander, dt) end
-		    end
-			-- rotate the lander anti-clockwise
-		    if keyDown("left") or keyDown("a") or keyDown("kp4") then
-				lander.angle = lander.angle - (90 * dt)
-		    end
-			-- rotate the lander clockwise
-		    if keyDown("right") or keyDown("d") or keyDown("kp6") then
-				lander.angle = lander.angle + (90 * dt)
-		    end
-		    if keyDown("q") or keyDown("kp7") then
-		        thrustLeft(lander, dt)
-		    end
-		    if keyDown("e") or keyDown("kp9") then
-		        thrustRight(lander, dt)
-		    end
-		end
-
-		-- TODO: Calculate the offset so that it doesn't need to be global
-		-- Calculate worldOffset for everyone based on lander x position
-		WORLD_OFFSET = Cf.round(LANDERS[1].x) - ORIGIN_X
-
-		-- Reset angle if > 360 degree
-		if math.max(lander.angle) > 360 then lander.angle = 0 end
-
-		-- Update ship
-	    moveShip(lander, dt)
-	    playSoundEffects(lander)
-	    checkForContact(lander, dt)
-		updateScore(lander)
-		updateBubbleText(dt)
-	end
-end
-
 function Lander.draw()
 	-- draw the lander and flame
 	for landerId, lander in pairs(LANDERS) do
@@ -751,5 +708,49 @@ function Lander.keypressed(key, scancode, isrepeat)
 	end
 end
 
+function Lander.update(dt)
+
+	for k, lander in pairs(LANDERS) do
+
+		-- need to ensure the player actions don't override bots and other players
+		--! probably don't want a FOR loop here
+		if k == 1 then
+			local keyDown = love.keyboard.isDown
+
+		    if keyDown("up") or keyDown("w") or keyDown("kp8") then
+				-- bot has it's own thrust routines
+				if not lander.isBot then Lander.doThrust(lander, dt) end
+		    end
+			-- rotate the lander anti-clockwise
+		    if keyDown("left") or keyDown("a") or keyDown("kp4") then
+				lander.angle = lander.angle - (90 * dt)
+		    end
+			-- rotate the lander clockwise
+		    if keyDown("right") or keyDown("d") or keyDown("kp6") then
+				lander.angle = lander.angle + (90 * dt)
+		    end
+		    if keyDown("q") or keyDown("kp7") then
+		        thrustLeft(lander, dt)
+		    end
+		    if keyDown("e") or keyDown("kp9") then
+		        thrustRight(lander, dt)
+		    end
+		end
+
+		-- TODO: Calculate the offset so that it doesn't need to be global
+		-- Calculate worldOffset for everyone based on lander x position
+		WORLD_OFFSET = Cf.round(LANDERS[1].x) - ORIGIN_X
+
+		-- Reset angle if > 360 degree
+		if math.max(lander.angle) > 360 then lander.angle = 0 end
+
+		-- Update ship
+	    moveShip(lander, dt)
+	    playSoundEffects(lander)
+	    checkForContact(lander, dt)
+		updateScore(lander)
+		updateBubbleText(dt)
+	end
+end
 
 return Lander
