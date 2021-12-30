@@ -10,6 +10,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 
 ### Changed
 - parachute now auto-deploys
+- font sizes are now larger
 
 ### Fixed
 - the end game text message is now correct
