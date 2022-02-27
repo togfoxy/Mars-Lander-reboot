@@ -16,6 +16,7 @@ The file format is based on [Keep a Change Log](https://keepachangelog.com/en/1.
 ### Fixed
 - the end game text message is now correct
 - the game music now plays properly
+- runtime error when AI travels too far
 
 ## v1.03
 
