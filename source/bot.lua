@@ -153,7 +153,7 @@ local function DetermineAction(lander, dt)
 
 	if not Lander.isOnLandingPad(lander, Enum.basetypeFuel) then
 		takeaction = true
-		print("not on landing pad")
+		-- print("not on landing pad")
 	else
 		-- lander has landed
 		-- check for full tank
@@ -166,7 +166,7 @@ local function DetermineAction(lander, dt)
 		-- check if base is out of fuel
 		if thisbase.fuelLeft[lander.uuid] <= 1 then
 			takeaction = true
-			print("base is empty")
+			-- print("base is empty")
 		end
 	end
 

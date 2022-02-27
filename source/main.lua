@@ -5,7 +5,7 @@
 -- https://github.com/togfoxy/MarsLander
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-GAME_VERSION = "1.04"
+GAME_VERSION = "1.05"
 
 love.window.setTitle("Mars Lander " .. GAME_VERSION)
 
@@ -293,7 +293,7 @@ function love.load()
 	Terrain.init()
 	NewModules.createModules()
 	Fun.LoadGameConfig()	-- this has to come after createModules because it modifies modules
-	
+
 	-- Play music
 	-- true for "isLooping"
 	-- must come after LoadGameConfig()

@@ -100,6 +100,21 @@ local function GetDistanceToFueledBase(uuid, xvalue, intBaseType)
 	if closestbase.x ~= nil then
 		-- the + bit is an offset to calculate the landing pad and not the image
 		realdist = xvalue - (closestbase.x + 85)
+	else
+		print(xvalue)
+		error("Closest base not found. Check debug")
+
+
+		-- searching for a base can outstrip the terrain so guard against that.
+	    while closestbase.x == nil or predictedx > #GROUND do
+	        Terrain.generate(SCREEN_WIDTH * 4)
+	        currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
+			print("Adding more terrain for bot")
+	    end
+
+
+
+
 	end
 	return realdist, closestbase
 end
@@ -114,10 +129,10 @@ local function GetCurrentState(lander)
     -- negative value means not yet past the base
     currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 	if currentDistanceToBase == nil then
-		print(predictedx, #GROUND)
-		error("Error. Check debug")
+		-- searching for a base can outstrip the terrain so guard against that.
+		Terrain.generate(SCREEN_WIDTH * 4)
+		currentDistanceToBase, closestbase = GetDistanceToFueledBase(lander.uuid, predictedx, Enum.basetypeFuel)
 	end
-
 
 	-- the AI will sometimes target a base that is well behind it. Guard against that.
 	if currentDistanceToBase > 1000 then
